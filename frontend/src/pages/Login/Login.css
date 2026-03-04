@@ -1,0 +1,226 @@
+/* ============================================
+   ChargeZone Login Page - CSS
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0f1923;
+}
+
+/* Full-page centered background */
+.login-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f1923;
+}
+
+/* The white-ish card */
+.login-box {
+  background-color: #1a2636;
+  border-radius: 16px;
+  padding: 40px 48px 48px;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Logo */
+.logo {
+  width: 200px;
+  height: auto;
+  margin-bottom: 28px;
+  object-fit: contain;
+}
+
+/* "Login" heading */
+.login-box h2,
+.login-box h3 {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* Subtitle "Welcome to ChargeZone" */
+.login-box p.subtitle,
+.login-box h3 + p,
+.login-subtitle {
+  color: #a0aab4;
+  font-size: 14px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+/* Error message */
+.error {
+  color: #e53935;
+  font-size: 13px;
+  background-color: rgba(229, 57, 53, 0.1);
+  border: 1px solid rgba(229, 57, 53, 0.3);
+  border-radius: 6px;
+  padding: 8px 14px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* Form layout */
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Labels */
+.form-label,
+form label {
+  display: block;
+  color: #c5cdd6;
+  font-size: 13px;
+  font-weight: 400;
+  margin-bottom: 6px;
+  margin-top: 0;
+}
+
+/* Input fields */
+form input[type="email"],
+form input[type="password"],
+form input[type="text"],
+.login-input {
+  width: 100%;
+  background-color: #1e2e40;
+  border: 1px solid #2a3d52;
+  border-radius: 8px;
+  color: #e8edf2;
+  font-size: 14px;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  caret-color: #e53935;
+}
+
+form input[type="email"]:focus,
+form input[type="password"]:focus,
+form input[type="text"]:focus,
+.login-input:focus {
+  border-color: #3a5068;
+  box-shadow: 0 0 0 3px rgba(58, 80, 104, 0.25);
+}
+
+form input::placeholder,
+.login-input::placeholder {
+  color: #4a5d6e;
+}
+
+/* Password wrapper (for show/hide eye icon) */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4a5d6e;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #8a9bb0;
+}
+
+/* Forgot password link */
+.forgot-password {
+  display: block;
+  text-align: right;
+  color: #3b82f6;
+  font-size: 13px;
+  text-decoration: none;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.forgot-password:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+/* Login button */
+form button[type="submit"],
+.login-btn {
+  width: 100%;
+  background-color: #e53935;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 16px;
+  cursor: pointer;
+  margin-top: 12px;
+  letter-spacing: 0.4px;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+form button[type="submit"]:hover,
+.login-btn:hover {
+  background-color: #c62828;
+  box-shadow: 0 4px 16px rgba(229, 57, 53, 0.35);
+}
+
+form button[type="submit"]:active,
+.login-btn:active {
+  transform: scale(0.99);
+  background-color: #b71c1c;
+}
+
+form button[type="submit"]:disabled,
+.login-btn:disabled {
+  background-color: #7a2320;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 620px) {
+  .login-box {
+    margin: 16px;
+    padding: 48px 32px 56px;
+    border-radius: 14px;
+  }
+
+  .logo {
+    width: 190px;
+  }
+}
