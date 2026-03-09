@@ -5,6 +5,8 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import EVLoader from "./EVLoader.jsx";
 import "./dashboard.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const BASE_URL = `${API_URL}`;
 const COLORS = ["#00d4aa", "#818cf8", "#fbbf24", "#e8303a", "#fb923c"];
 

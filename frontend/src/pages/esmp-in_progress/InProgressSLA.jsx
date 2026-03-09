@@ -3,6 +3,7 @@ import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
 const BASE_URL = `${API_URL}/api/emsp-in-progress`;
 const SETTLEMENT_PREVIEW = `${API_URL}/api/settlement/preview`;
 const SETTLEMENT_PUSH = `${API_URL}/api/settlement/push`;
