@@ -3,9 +3,9 @@ import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const BASE_URL = "http://localhost:5000/api/emsp-in-progress";
-const SETTLEMENT_PREVIEW = "http://localhost:5000/api/settlement/preview";
-const SETTLEMENT_PUSH = "http://localhost:5000/api/settlement/push";
+const BASE_URL = `${API_URL}/api/emsp-in-progress`;
+const SETTLEMENT_PREVIEW = `${API_URL}/api/settlement/preview`;
+const SETTLEMENT_PUSH = `${API_URL}/api/settlement/push`;
 
 /* ───────── Deep flatten ───────── */
 function flattenObject(obj, prefix = "") {
