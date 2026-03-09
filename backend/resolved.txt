@@ -1,0 +1,1 @@
+mongodb://cluster1-shard-00-00.0pycd.mongodb.net:27017,cluster1-shard-00-03.0pycd.mongodb.net:27017,cluster1-shard-00-02.0pycd.mongodb.net:27017,cluster1-shard-00-01.0pycd.mongodb.net:27017/?ssl=true&authSource=admin&authSource=admin&replicaSet=atlas-qb8rl3-shard-0

@@ -7,8 +7,8 @@ const stationExplorerRoutes = require("./modules/station-explorer/station.routes
 const chargerRoutes = require("./modules/station-explorer/charger.routes");
 const cdrRecoveryRoutes = require("./modules/cdr-recovery/cdr.routes");
 const inProgressRoutes = require("./modules/emsp-in-progress/inprogress.routes");
-
-
+const settlementRoutes = require("./modules/settlement/settlement.routes");
+const inprogressAnalysisRoutes = require("./modules/inprogress-analysis/analysis.routes");
 
 const app = express();
 
@@ -21,5 +21,7 @@ app.use("/api/station-explorer", stationExplorerRoutes);
 app.use("/api/station-explorer/chargers", chargerRoutes);
 app.use("/api/cdr-recovery", cdrRecoveryRoutes);
 app.use("/api/emsp-in-progress", inProgressRoutes);
+app.use("/api/settlement", settlementRoutes);
+app.use("/api/emsp-in-progress-analysis", inprogressAnalysisRoutes);
 
 module.exports = app;

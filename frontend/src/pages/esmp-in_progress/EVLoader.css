@@ -38,9 +38,7 @@
 }
 
 @keyframes ev-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .ev-icon {
@@ -50,17 +48,8 @@
 }
 
 @keyframes ev-pulse {
-
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: scale(0.92);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0%, 100% { opacity: 0.5; transform: scale(0.92); }
+  50%       { opacity: 1;   transform: scale(1); }
 }
 
 .ev-loader-text {

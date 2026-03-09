@@ -85,9 +85,7 @@ exports.buildPayload = async (db, bookingId) => {
     .findOne({ _id: safeId(session.ocpiCredential) });
 
   const rawToken = credential?.token || null;
-  const encodedToken = rawToken
-    ? Buffer.from(rawToken).toString("base64")
-    : null;
+  const encodedToken = rawToken;;
 
   // 🟣 TARIFF
   const tariff = await db.collection("tarrifs")

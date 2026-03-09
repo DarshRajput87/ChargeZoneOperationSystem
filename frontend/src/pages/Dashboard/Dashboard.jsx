@@ -26,9 +26,9 @@ const CustomTooltip = ({ active, payload }) => {
 // ── SERVER STATUS BADGE ──────────────────────────────────────────
 const ServerBadge = ({ status }) => {
   const map = {
-    online:   { dot: "#00d4aa", label: "Server Online",  bg: "rgba(0,212,170,0.08)",  border: "rgba(0,212,170,0.2)"  },
-    offline:  { dot: "#e8303a", label: "Server Offline", bg: "rgba(232,48,58,0.08)",  border: "rgba(232,48,58,0.2)"  },
-    checking: { dot: "#fbbf24", label: "Checking...",    bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.2)" },
+    online: { dot: "#00d4aa", label: "Server Online", bg: "rgba(0,212,170,0.08)", border: "rgba(0,212,170,0.2)" },
+    offline: { dot: "#e8303a", label: "Server Offline", bg: "rgba(232,48,58,0.08)", border: "rgba(232,48,58,0.2)" },
+    checking: { dot: "#fbbf24", label: "Checking...", bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.2)" },
   };
   const s = map[status] ?? map.checking;
   return (
@@ -44,10 +44,10 @@ const ServerBadge = ({ status }) => {
 
 // ── DASHBOARD ────────────────────────────────────────────────────
 const Dashboard = () => {
-  const [metrics, setMetrics]           = useState(null);
+  const [metrics, setMetrics] = useState(null);
   const [serverStatus, setServerStatus] = useState("checking");
-  const [refreshing, setRefreshing]     = useState(false);
-  const [lastUpdated, setLastUpdated]   = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   // Ping server health, fallback to metrics endpoint
   const checkServer = useCallback(async () => {
@@ -97,11 +97,11 @@ const Dashboard = () => {
   }, [handleRefresh]);
 
   const chargerData = metrics ? [
-    { name: "Available",   value: metrics.chargerStats.available   ?? 0 },
-    { name: "In Use",      value: metrics.chargerStats.inUse       ?? 0 },
+    { name: "Available", value: metrics.chargerStats.available ?? 0 },
+    { name: "In Use", value: metrics.chargerStats.inUse ?? 0 },
     { name: "Unavailable", value: metrics.chargerStats.unavailable ?? 0 },
-    { name: "Power Loss",  value: metrics.chargerStats.powerLoss   ?? 0 },
-    { name: "Faulted",     value: metrics.chargerStats.faulted     ?? 0 },
+    { name: "Power Loss", value: metrics.chargerStats.powerLoss ?? 0 },
+    { name: "Faulted", value: metrics.chargerStats.faulted ?? 0 },
   ] : [];
 
   const total = metrics?.chargerStats?.total || 0;
@@ -146,7 +146,7 @@ const Dashboard = () => {
                 disabled={refreshing}
                 title="Refresh data"
               >
-                <span className={`refresh-icon${refreshing ? " refresh-icon--spin" : ""}`}>↻</span>
+                <span className={`refresh-icon${refreshing ? " refresh-icon--spin" : ""}`}></span>
                 {refreshing ? "Refreshing..." : "Refresh"}
               </button>
             </div>
