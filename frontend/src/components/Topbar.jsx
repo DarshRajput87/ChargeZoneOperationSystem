@@ -31,7 +31,7 @@ const Topbar = () => {
   return (
     <div className="topbar">
       <div className="topbar-title">
-        ChargeZone Operational Engine {getPageName() && ` / ${getPageName()}`}
+        ChargeZone Operations {getPageName() && ` / ${getPageName()}`}
       </div>
 
       <div className="topbar-right">

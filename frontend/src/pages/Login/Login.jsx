@@ -29,7 +29,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-box">
         <img src={logo} alt="ChargeZone Logo" className="logo" />
-        <h3>Chargezone Operation Engine</h3>
+        <h3>Chargezone Operations</h3>
 
         {error && <p className="error">{error}</p>}
 
