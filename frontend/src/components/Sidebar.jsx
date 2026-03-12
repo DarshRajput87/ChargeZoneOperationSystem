@@ -28,6 +28,7 @@ const Sidebar = () => {
         {/* Dashboard */}
         <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/station-explorer">Station Explorer</NavLink>
+        <NavLink to="/fleet">Fleet</NavLink>
 
         {/* EMSP MODULE */}
         <div className="menu-module">

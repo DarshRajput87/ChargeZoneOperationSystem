@@ -18,7 +18,8 @@ exports.getSessions = async (req, res) => {
     res.json({
       success: true,
       data: result.data,
-      total: result.total
+      total: result.total,
+      nextCursor: result.nextCursor
     });
 
   } catch (err) {

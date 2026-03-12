@@ -5,26 +5,28 @@ class InProgressService {
     this.collection = db.collection("ocpi_emsp_in_progressbooking");
   }
 
-  async getSessions({ partyId, status, page = 1, limit = 10 }) {
+  async getSessions({ partyId, status, cursor, limit = 10 }) {
 
     const query = {};
 
     if (partyId) query.partyId = partyId;
     if (status) query.status = status;
 
-    const skip = (page - 1) * limit;
+    if (cursor) {
+      query._id = { $lt: new ObjectId(cursor) };
+    }
 
-    const [data, total] = await Promise.all([
-      this.collection
-        .find(query)
-        .sort({ updatedAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .toArray(),
-      this.collection.countDocuments(query)
-    ]);
+    const parsedLimit = parseInt(limit) || 10;
 
-    return { data, total };
+    const data = await this.collection
+      .find(query)
+      .sort({ _id: -1 })
+      .limit(parsedLimit)
+      .toArray();
+
+    const nextCursor = data.length > 0 ? data[data.length - 1]._id.toString() : null;
+
+    return { data, total: 0, nextCursor };
   }
 
   async getSummary() {
@@ -51,7 +53,7 @@ class InProgressService {
           }
         }
       }
-    ]).toArray();
+    ], { allowDiskUse: true }).toArray();
 
     return result;
   }

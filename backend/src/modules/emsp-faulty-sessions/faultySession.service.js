@@ -5,26 +5,27 @@ class FaultySessionService {
             db.collection("ocpi_emsp_faulty_session");
     }
 
-    async getSessions({ partyId, page = 1, limit = 10 }) {
+    async getSessions({ partyId, cursor, limit = 10 }) {
 
         const query = { still_exist: true };
 
         if (partyId) query.partyId = partyId;
 
-        const skip = (page - 1) * limit;
+        // Implement Cursor-Based Pagination
+        if (cursor) {
+            query._id = { $lt: new require("mongodb").ObjectId(cursor) };
+        }
 
-        const [docs, total] = await Promise.all([
+        const parsedLimit = parseInt(limit) || 10;
 
-            this.collection
-                .find(query)
-                .sort({ created_at: -1 })
-                .skip(skip)
-                .limit(limit)
-                .toArray(),
+        const docs = await this.collection
+            .find(query)
+            .sort({ _id: -1 }) // Sort by _id to match the cursor behavior
+            .limit(parsedLimit)
+            .toArray();
 
-            this.collection.countDocuments(query)
-
-        ]);
+        // Calculate the next cursor for the frontend
+        const nextCursor = docs.length > 0 ? docs[docs.length - 1]._id.toString() : null;
 
         const data = docs.map(d => {
 
@@ -35,6 +36,7 @@ class FaultySessionService {
 
                 bookingId: d.bookingId,
                 partyId: d.partyId,
+                tenantId: d.tenant_id,
 
                 faultyReason:
                     d.faulty_reasons?.join(", ") || "Unknown",
@@ -53,7 +55,8 @@ class FaultySessionService {
 
         });
 
-        return { data, total };
+        // We return an empty total to avoid countDocuments at 1M rows
+        return { data, total: 0, nextCursor };
 
     }
 
