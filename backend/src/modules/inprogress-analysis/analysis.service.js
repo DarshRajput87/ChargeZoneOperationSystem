@@ -2,7 +2,7 @@ exports.getAnalysis = async (coeDb, cmsDb) => {
 
     // 1️⃣ Get active sessions
     const sessions = await coeDb
-        .collection("ocpiemsp_in_progressbooking")
+        .collection("ocpi_emsp_in_progressbooking")
         .find({ status: "in_progress" })
         .toArray();
 

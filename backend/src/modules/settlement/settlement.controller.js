@@ -31,11 +31,25 @@ exports.pushSettlement = async (req, res) => {
 
     try {
 
-        const { payload, token } = req.body;
+        const { payload, token, bookingId } = req.body;
 
-        const result = await service.pushSettlement(payload, token);
+        // ── 1. Push CDR to ChargeCloud ──────────────────────────────────
+        const pushResult = await service.pushSettlement(payload, token);
 
-        res.json(result);
+        // ── 2. Stamp COE record with ui_updated + prodCompleted ─────────
+        const settleUpdate = await service.postSettleUpdate(
+            global.coeDb,
+            global.cmsDb,
+            bookingId,
+            pushResult.success
+        );
+
+        // ── 3. Return combined result ───────────────────────────────────
+        res.json({
+            ...pushResult,
+            ui_updated: settleUpdate.ui_updated,
+            prodCompleted: settleUpdate.prodCompleted
+        });
 
     } catch (err) {
 

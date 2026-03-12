@@ -11,6 +11,7 @@ import CDR_PUSH from "../pages/CDR-Push/CDR-Push";
 
 import InProgressSLA from "../pages/esmp-in_progress/InProgressSLA";
 import InProgressAnalysis from "../pages/emps-in_progress_analysis/InProgressAnalysis";
+import FaultySLA from "../pages/emps-faulty-session/FaultyDashboard";
 
 const AppRoutes = () => {
   return (
@@ -50,6 +51,15 @@ const AppRoutes = () => {
           element={
             <DashboardLayout>
               <InProgressAnalysis />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/emsp-faulty-sessions"
+          element={
+            <DashboardLayout>
+              <FaultySLA />
             </DashboardLayout>
           }
         />

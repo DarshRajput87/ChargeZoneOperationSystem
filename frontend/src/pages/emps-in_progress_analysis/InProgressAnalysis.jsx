@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import "./InProgressAnalysis.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
-const BASE_URL = `${API_URL}/api/emsp-in-progress-analysis`;
+const BASE_URL = "http://localhost:5000/api/emsp-in-progress-analysis";
 const SPARK_DATA = [1, 2, 1, 3, 2, 3, 4, 3, 5, 3, 4, 3];
 
 // ── Helpers ────────────────────────────────────────────────────────────────

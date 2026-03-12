@@ -76,6 +76,39 @@ const Sidebar = () => {
                 )}
 
               </div>
+              <div className="submenu-group">
+
+                <div
+                  className="submenu-item submenu-group-title"
+                  onClick={() => toggleSubMenu("faulty")}
+                >
+                  <span>Faulty</span>
+                  <span className="submenu-arrow">
+                    {openSubMenu === "faulty" ? "▾" : "▸"}
+                  </span>
+                </div>
+
+                {openSubMenu === "faulty" && (
+                  <div className="submenu submenu-nested">
+
+                    <NavLink
+                      to="/emsp-faulty-sessions"
+                      className="submenu-item submenu-item--nested"
+                    >
+                      Sessions
+                    </NavLink>
+
+                    <NavLink
+                      to="/emsp-faulty-analysis"
+                      className="submenu-item submenu-item--nested"
+                    >
+                      Analysis
+                    </NavLink>
+
+                  </div>
+                )}
+
+              </div>
 
               {/* ── CDR Builder ── */}
               <NavLink

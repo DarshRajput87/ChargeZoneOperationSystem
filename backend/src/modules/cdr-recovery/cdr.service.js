@@ -1,41 +1,57 @@
 const mongoose = require("mongoose");
 
+// =====================================================
+// SAFE OBJECT ID
+// =====================================================
 const safeId = (val) => {
   if (!val) return null;
+
   if (val instanceof mongoose.Types.ObjectId) return val;
-  if (mongoose.Types.ObjectId.isValid(val))
+
+  if (mongoose.Types.ObjectId.isValid(val)) {
     return new mongoose.Types.ObjectId(val);
+  }
+
   return null;
 };
 
+// =====================================================
+// BASE PAYLOAD TEMPLATE
+// =====================================================
 const basePayload = {
   country_code: "IN",
-  party_id: "STQ",
+  party_id: "",
   id: "",
   start_date_time: "",
-  end_date_time: null,
+  end_date_time: "",
   session_id: "",
   cdr_token: {},
-  charging_periods: [{
-    start_date_time: "",
-    dimensions: [{ type: "ENERGY", volume: "0" }],
-    tariff_id: ""
-  }],
+  charging_periods: [
+    {
+      start_date_time: "",
+      dimensions: [{ type: "ENERGY", volume: "0" }],
+      tariff_id: ""
+    }
+  ],
   auth_method: "COMMAND",
   currency: "INR",
   tariffs: {
     country_code: "IN",
-    party_id: "STQ",
+    party_id: "",
     id: "",
     currency: "INR",
-    elements: [{
-      price_components: [{
-        type: "ENERGY",
-        price: 0,
-        vat: 0,
-        step_size: 1
-      }]
-    }],
+    elements: [
+      {
+        price_components: [
+          {
+            type: "ENERGY",
+            price: 0,
+            vat: 0,
+            step_size: 1
+          }
+        ]
+      }
+    ],
     last_updated: ""
   },
   cdr_location: {
@@ -56,87 +72,138 @@ const basePayload = {
   authorization_reference: ""
 };
 
+// =====================================================
+// BUILD PAYLOAD
+// =====================================================
 exports.buildPayload = async (db, bookingId) => {
 
-  // 🔵 SESSION
+  // ---------------------------------------------------
+  // SESSION
+  // ---------------------------------------------------
   const session = await db.collection("ocpiemspsessions")
-    .findOne({ authorization_reference: bookingId });
+    .findOne({ authorization_reference: String(bookingId) });
 
   if (!session) {
-    return {
-      error: "OCPI session not found",
-      bookingStatus: null
-    };
+    return { error: "OCPI session not found" };
   }
 
-  // 🟢 BOOKING
+  // ---------------------------------------------------
+  // BOOKING
+  // ---------------------------------------------------
   const booking = await db.collection("chargerbookings")
     .findOne({ _id: safeId(session.authorization_reference) });
 
   if (!booking) {
-    return {
-      error: "Booking not found",
-      bookingStatus: null
-    };
+    return { error: "Booking not found" };
   }
 
-  // 🟣 OCPI CREDENTIAL
+  // ---------------------------------------------------
+  // OCPI CREDENTIAL
+  // ---------------------------------------------------
   const credential = await db.collection("ocpicredentials")
     .findOne({ _id: safeId(session.ocpiCredential) });
 
-  const rawToken = credential?.token || null;
-  const encodedToken = rawToken;;
+  const token = credential?.token || null;
 
-  // 🟣 TARIFF
+  // ---------------------------------------------------
+  // TARIFF
+  // ---------------------------------------------------
   const tariff = await db.collection("tarrifs")
     .findOne({ _id: safeId(session.tariff_id) });
 
-  // 🔌 CHARGER
+  // ---------------------------------------------------
+  // CHARGER
+  // ---------------------------------------------------
   const charger = await db.collection("chargers")
     .findOne({ _id: safeId(booking?.charger) });
 
-  // 🏢 STATION
+  // ---------------------------------------------------
+  // STATION
+  // ---------------------------------------------------
   const station = await db.collection("chargingstations")
-    .findOne({ external_location_id: String(session.location_id) });
+    .findOne({
+      external_location_id: String(session.location_id)
+    });
 
+  // ---------------------------------------------------
+  // RESOLVE END DATE
+  // ---------------------------------------------------
+  const resolvedEndDateTime =
+    session.updatedAt ||
+    booking?.booking_cancel_time ||
+    session.updatedAt ||
+    null;
+
+  // ---------------------------------------------------
+  // CLONE BASE PAYLOAD
+  // ---------------------------------------------------
   const payload = JSON.parse(JSON.stringify(basePayload));
 
+  // ---------------------------------------------------
+  // SESSION DATA
+  // ---------------------------------------------------
   payload.party_id = session.party_id;
   payload.id = session.sessionId;
   payload.session_id = session.sessionId;
+
   payload.authorization_reference = session.authorization_reference;
-  payload.start_date_time = session.start_date_time;
-  payload.last_updated = session.last_updated;
+
+  payload.start_date_time = session.start_date_time
+    ? new Date(session.start_date_time).toISOString()
+    : null;
+
+  payload.last_updated = session.last_updated
+    ? new Date(session.last_updated).toISOString()
+    : null;
+
   payload.cdr_token = session.cdr_token;
 
-  payload.end_date_time =
-    session.end_date_time
-      ? new Date(session.end_date_time).toISOString()
-      : null;
+  // ---------------------------------------------------
+  // END DATE TIME
+  // ---------------------------------------------------
+  payload.end_date_time = resolvedEndDateTime
+    ? new Date(resolvedEndDateTime).toISOString()
+    : null;
 
+  // ---------------------------------------------------
+  // CHARGING PERIOD
+  // ---------------------------------------------------
   payload.charging_periods[0].start_date_time =
-    session.start_date_time;
+    session.start_date_time
+      ? new Date(session.start_date_time).toISOString()
+      : null;
 
   payload.charging_periods[0].dimensions[0].volume =
     String(session.kwh || 0);
 
   payload.total_energy = session.kwh || 0;
 
+  // ---------------------------------------------------
+  // COST
+  // ---------------------------------------------------
   payload.total_cost.excl_vat =
     String(session.total_cost?.[0]?.excl_vat || "0");
 
   payload.total_cost.incl_vat =
     String(session.total_cost?.[0]?.incl_vat || "0");
 
+  // ---------------------------------------------------
+  // EVSE
+  // ---------------------------------------------------
   payload.cdr_location.evse_uid = session.evse_uid;
 
-  payload.cdr_location.evse_id =
-    charger
-      ? `${session.country_code}*${session.party_id}*${booking.charger}`
-      : "EVSE_NOT_FOUND";
+  payload.cdr_location.evse_id = charger
+    ? `${session.country_code}*${session.party_id}*${booking.charger}`
+    : "EVSE_NOT_FOUND";
 
+  // ---------------------------------------------------
+  // TARIFF SECTION
+  // ---------------------------------------------------
   payload.charging_periods[0].tariff_id =
     tariff?.external_tariff_id || "TARIFF_NOT_FOUND";
+
+  payload.tariffs.party_id =
+    tariff?.external_party_id || session.party_id;
 
   payload.tariffs.id =
     tariff?.external_tariff_id || "TARIFF_NOT_FOUND";
@@ -144,9 +211,16 @@ exports.buildPayload = async (db, bookingId) => {
   payload.tariffs.elements[0].price_components[0].price =
     tariff?.default_price_per_unit || 0;
 
-  payload.tariffs.last_updated = session.last_updated;
+  payload.tariffs.last_updated =
+    tariff?.updatedAt
+      ? new Date(tariff.updatedAt).toISOString()
+      : null;
 
+  // ---------------------------------------------------
+  // LOCATION
+  // ---------------------------------------------------
   if (station) {
+
     payload.cdr_location.name = station.name;
     payload.cdr_location.city = station.city;
     payload.cdr_location.address = station.address;
@@ -157,12 +231,17 @@ exports.buildPayload = async (db, bookingId) => {
       latitude: station.location?.lat,
       longitude: station.location?.lng
     };
+
   }
 
+  // ---------------------------------------------------
+  // RETURN RESULT
+  // ---------------------------------------------------
   return {
     payload,
-    token: encodedToken,
+    token,
     bookingStatus: booking.status,
     error: null
   };
+
 };

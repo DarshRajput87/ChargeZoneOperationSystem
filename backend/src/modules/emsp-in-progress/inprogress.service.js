@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 
 class InProgressService {
   constructor(db) {
-    this.collection = db.collection("ocpiemsp_in_progressbooking");
+    this.collection = db.collection("ocpi_emsp_in_progressbooking");
   }
 
   async getSessions({ partyId, status, page = 1, limit = 10 }) {

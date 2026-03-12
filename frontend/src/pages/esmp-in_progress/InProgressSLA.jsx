@@ -3,10 +3,9 @@ import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
-const BASE_URL = `${API_URL}/api/emsp-in-progress`;
-const SETTLEMENT_PREVIEW = `${API_URL}/api/settlement/preview`;
-const SETTLEMENT_PUSH = `${API_URL}/api/settlement/push`;
+const BASE_URL = "http://localhost:5000/api/emsp-in-progress";
+const SETTLEMENT_PREVIEW = "http://localhost:5000/api/settlement/preview";
+const SETTLEMENT_PUSH = "http://localhost:5000/api/settlement/push";
 
 /* ───────── Deep flatten ───────── */
 function flattenObject(obj, prefix = "") {
@@ -62,12 +61,227 @@ function FlatCard({ label, value }) {
   );
 }
 
+/* ───────── Method Selection Modal ───────── */
+function MethodSelectionModal({ session, onSelect, onClose }) {
+  const [hovered, setHovered] = useState(null);
+
+  return (
+    <div className="modal" onClick={onClose}>
+      <div
+        className="modal-content method-select-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "520px",
+          background: "#0b1520",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: "20px",
+          overflow: "hidden",
+        }}
+      >
+        {/* Header */}
+        <div
+          className="modal-header"
+          style={{
+            background: "linear-gradient(135deg, rgba(239,68,68,0.07) 0%, transparent 55%)",
+            borderBottom: "1px solid rgba(239,68,68,0.1)",
+            padding: "22px 26px 20px",
+          }}
+        >
+          <div className="settle-header-left">
+            <span className="settle-eyebrow">Force Settlement</span>
+            <h3 style={{ fontSize: "17px", fontWeight: 600, letterSpacing: "-0.02em" }}>
+              Choose Settlement Method
+            </h3>
+          </div>
+          <button className="modal-x" onClick={onClose}>✕</button>
+        </div>
+
+        {/* Identity strip */}
+        <div className="settle-identity">
+          <div className="settle-id-chip">
+            <span className="chip-label">Booking ID</span>
+            <span className="chip-mono">{session.bookingId}</span>
+          </div>
+          <div className="settle-id-chip">
+            <span className="chip-label">Party</span>
+            <span className="chip-mono">{session.partyId}</span>
+          </div>
+          <div className="settle-id-chip">
+            <span className="chip-label">Status</span>
+            <span className="chip-status">{session.status}</span>
+          </div>
+        </div>
+
+        {/* Method cards */}
+        <div style={{ padding: "20px 22px 8px" }}>
+          <p style={{
+            fontSize: "12px",
+            color: "var(--text-muted)",
+            marginBottom: "16px",
+            letterSpacing: "0.01em",
+            lineHeight: 1.6,
+          }}>
+            Select how you want to close this session. Both methods will push a CDR to the operator.
+          </p>
+
+          <div style={{ display: "flex", gap: "12px", flexDirection: "column" }}>
+
+            {/* CDR Builder option */}
+            <button
+              onMouseEnter={() => setHovered("cdr")}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => onSelect("cdr")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "16px",
+                padding: "18px 20px",
+                background: hovered === "cdr"
+                  ? "rgba(59,130,246,0.1)"
+                  : "rgba(59,130,246,0.045)",
+                border: hovered === "cdr"
+                  ? "1px solid rgba(59,130,246,0.45)"
+                  : "1px solid rgba(59,130,246,0.2)",
+                borderRadius: "12px",
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "all 0.18s ease",
+                transform: hovered === "cdr" ? "translateY(-1px)" : "translateY(0)",
+                boxShadow: hovered === "cdr" ? "0 4px 20px rgba(59,130,246,0.15)" : "none",
+              }}
+            >
+              <div style={{
+                width: "42px",
+                height: "42px",
+                flexShrink: 0,
+                borderRadius: "10px",
+                background: "rgba(59,130,246,0.15)",
+                border: "1px solid rgba(59,130,246,0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "20px",
+              }}>
+                🔧
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#7eb8f7",
+                  marginBottom: "4px",
+                  letterSpacing: "-0.01em",
+                }}>
+                  CDR Builder
+                </div>
+                <div style={{
+                  fontSize: "12px",
+                  color: "var(--text-muted)",
+                  lineHeight: 1.5,
+                }}>
+                  Interactively review and edit the settlement payload before pushing to the operator.
+                </div>
+              </div>
+              <div style={{
+                color: hovered === "cdr" ? "#7eb8f7" : "var(--text-muted)",
+                fontSize: "18px",
+                transition: "color 0.15s ease, transform 0.15s ease",
+                transform: hovered === "cdr" ? "translateX(3px)" : "translateX(0)",
+                flexShrink: 0,
+              }}>
+                →
+              </div>
+            </button>
+
+            {/* Script option */}
+            <button
+              onMouseEnter={() => setHovered("script")}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => onSelect("script")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "16px",
+                padding: "18px 20px",
+                background: hovered === "script"
+                  ? "rgba(239,68,68,0.1)"
+                  : "rgba(239,68,68,0.045)",
+                border: hovered === "script"
+                  ? "1px solid rgba(239,68,68,0.45)"
+                  : "1px solid rgba(239,68,68,0.2)",
+                borderRadius: "12px",
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "all 0.18s ease",
+                transform: hovered === "script" ? "translateY(-1px)" : "translateY(0)",
+                boxShadow: hovered === "script" ? "0 4px 20px rgba(239,68,68,0.15)" : "none",
+              }}
+            >
+              <div style={{
+                width: "42px",
+                height: "42px",
+                flexShrink: 0,
+                borderRadius: "10px",
+                background: "rgba(239,68,68,0.15)",
+                border: "1px solid rgba(239,68,68,0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "20px",
+              }}>
+                ⚡
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#f87171",
+                  marginBottom: "4px",
+                  letterSpacing: "-0.01em",
+                }}>
+                  Script
+                </div>
+                <div style={{
+                  fontSize: "12px",
+                  color: "var(--text-muted)",
+                  lineHeight: 1.5,
+                }}>
+                  Automatically generate and push the CDR using the pre-built settlement script.
+                </div>
+              </div>
+              <div style={{
+                color: hovered === "script" ? "#f87171" : "var(--text-muted)",
+                fontSize: "18px",
+                transition: "color 0.15s ease, transform 0.15s ease",
+                transform: hovered === "script" ? "translateX(3px)" : "translateX(0)",
+                flexShrink: 0,
+              }}>
+                →
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="modal-footer" style={{ padding: "16px 22px", justifyContent: "flex-end" }}>
+          <button className="modal-close-btn" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── Dashboard ───────── */
 export default function InProgressDashboard() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
+
+  // NEW: method selection state
+  const [methodSession, setMethodSession] = useState(null);
+
   const [settleSession, setSettleSession] = useState(null);
   const [payload, setPayload] = useState(null);
   const [token, setToken] = useState("");
@@ -105,15 +319,53 @@ export default function InProgressDashboard() {
     return "sla-safe";
   };
 
-  const handleSettle = async (session) => {
-    try {
-      const res = await axios.get(`${SETTLEMENT_PREVIEW}/${session.bookingId}`);
-      if (!res.data.success) { alert(res.data.error); return; }
-      setPayload(res.data.payload);
-      setToken(res.data.token);
-      setSettleSession(session);
-    } catch {
-      alert("Failed to build settlement payload");
+  const getStatusBadgeClass = (status) => {
+    const s = (status || "").toLowerCase();
+    if (s === "completed") return "badge status-completed";
+    if (s === "in_progress") return "badge status";
+    return "badge status-other";
+  };
+
+  const isSettleable = (s) => {
+    const isInProgress = (s.status || "").toLowerCase() === "in_progress";
+    const { hours } = calculateSLA(s.bookingStartTime);
+    return isInProgress && hours >= 48;
+  };
+
+  /* Step 1: open method selection modal */
+  const handleSettleClick = (session) => {
+    setMethodSession(session);
+  };
+
+  /* Step 2: user picks a method */
+  const handleMethodSelect = async (method) => {
+    const session = methodSession;
+    setMethodSession(null); // close method modal
+
+    if (method === "script") {
+      // Proceed directly to existing settlement modal (auto-fetch payload)
+      try {
+        const res = await axios.get(`${SETTLEMENT_PREVIEW}/${session.bookingId}`);
+        if (!res.data.success) { alert(res.data.error); return; }
+        setPayload(res.data.payload);
+        setToken(res.data.token);
+        setSettleSession(session);
+      } catch {
+        alert("Failed to build settlement payload");
+      }
+    } else if (method === "cdr") {
+      // CDR Builder flow — open settlement modal same way (or swap for a dedicated CDR builder modal)
+      try {
+        const res = await axios.get(`${SETTLEMENT_PREVIEW}/${session.bookingId}`);
+        if (!res.data.success) { alert(res.data.error); return; }
+        setPayload(res.data.payload);
+        setToken(res.data.token);
+        setSettleSession(session);
+        // NOTE: swap `setSettleSession` here for a dedicated CDR builder modal state
+        //       e.g. setCdrBuilderSession(session) — when that modal is ready
+      } catch {
+        alert("Failed to build settlement payload");
+      }
     }
   };
 
@@ -211,11 +463,14 @@ export default function InProgressDashboard() {
             <tbody>
               {sessions.map((s) => {
                 const { hours, minutes } = calculateSLA(s.bookingStartTime);
-                const breach = hours >= 48;
                 return (
                   <tr key={s._id}>
                     <td><span className="mono">{s.bookingId}</span></td>
-                    <td><span className="badge status">{s.status}</span></td>
+                    <td>
+                      <span className={getStatusBadgeClass(s.status)}>
+                        {s.status}
+                      </span>
+                    </td>
                     <td><span className="badge party">{s.partyId}</span></td>
                     <td>
                       <span className={`badge ${getSLAClass(hours)}`}>
@@ -224,11 +479,12 @@ export default function InProgressDashboard() {
                     </td>
                     <td>
                       <button
-                        className={`btn-settle ${breach ? "active" : ""}`}
-                        disabled={!breach}
-                        onClick={() => handleSettle(s)}
+                        className={`btn-settle ${isSettleable(s) ? "active" : ""} ${(s.status || "").toLowerCase() === "completed" ? "completed" : ""}`}
+                        disabled={!isSettleable(s)}
+                        onClick={() => handleSettleClick(s)}
+                        title={(s.status || "").toLowerCase() === "completed" ? "Already completed — no action needed" : !isSettleable(s) ? "Within SLA or not in progress" : "Force settle this session"}
                       >
-                        Settle
+                        {(s.status || "").toLowerCase() === "completed" ? "Completed" : "Settle"}
                       </button>
                     </td>
                     <td>
@@ -243,6 +499,15 @@ export default function InProgressDashboard() {
           </table>
         )}
       </div>
+
+      {/* ════ METHOD SELECTION MODAL (NEW — shown first) ════ */}
+      {methodSession && (
+        <MethodSelectionModal
+          session={methodSession}
+          onSelect={handleMethodSelect}
+          onClose={() => setMethodSession(null)}
+        />
+      )}
 
       {/* ════ VIEW SESSION MODAL ════ */}
       {selectedSession && (

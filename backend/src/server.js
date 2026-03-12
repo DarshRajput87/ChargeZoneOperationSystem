@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const app = require("./app");
 const cron = require("node-cron");
 const { generateMetrics } = require("./modules/dashboard/dashboard.service");
+const { syncSlaStatuses } = require("./modules/sla-sync/sla-sync.service");
 
 const PORT = process.env.PORT || 5000;
 
@@ -38,10 +39,19 @@ mongoose.connect(process.env.MONGO_URI, {
       global.cmsConnection = cmsConnection;   // keep this
       global.cmsDb = cmsConnection.db;        // add this
 
+      // ── Dashboard metrics (every 15 min) ────────────────────────────
       await generateMetrics();
 
       cron.schedule("*/15 * * * *", async () => {
         await generateMetrics();
+      });
+
+      // ── SLA Status Sync (every 1 hour) ──────────────────────────────
+      // Run once on startup, then every hour on the hour
+      await syncSlaStatuses(global.coeDb, global.cmsDb);
+
+      cron.schedule("0 * * * *", async () => {
+        await syncSlaStatuses(global.coeDb, global.cmsDb);
       });
 
       app.listen(PORT, () => {
