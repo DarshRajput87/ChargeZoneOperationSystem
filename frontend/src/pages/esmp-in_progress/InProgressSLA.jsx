@@ -3,9 +3,9 @@ import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const BASE_URL = "http://localhost:5000/api/emsp-in-progress";
-const SETTLEMENT_PREVIEW = "http://localhost:5000/api/settlement/preview";
-const SETTLEMENT_PUSH = "http://localhost:5000/api/settlement/push";
+const BASE_URL = "http://13.232.112.152:5000/api/emsp-in-progress";
+const SETTLEMENT_PREVIEW = "http://13.232.112.152:5000/api/settlement/preview";
+const SETTLEMENT_PUSH = "http://13.232.112.152:5000/api/settlement/push";
 
 // ─── How long completed sessions stay visible (ms) ───────────────────────────
 const VISIBILITY_WINDOW_MS = 10 * 60 * 1000; // 10 minutes

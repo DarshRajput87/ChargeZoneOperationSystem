@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/station-explorer";
+const BASE_URL = "http://13.232.112.152:5000/api/station-explorer";
 
 export const fetchStations = async (search = "", page = 1, limit = 10) => {
   const res = await axios.get(BASE_URL, {
