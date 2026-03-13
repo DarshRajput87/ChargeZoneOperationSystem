@@ -15,11 +15,29 @@ const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.r
 
 const app = express();
 
-app.use(cors(
-    {
-        origin: "*",
-    }
-));
+const allowedOrigins = [
+    "https://www.chargezoneops.online",
+    "https://chargezoneops.online",
+    "http://localhost:5173",
+    "http://localhost:3000",
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS: " + origin));
+        }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+}));
+
+// Handle preflight OPTIONS requests for all routes
+app.options("*", cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
