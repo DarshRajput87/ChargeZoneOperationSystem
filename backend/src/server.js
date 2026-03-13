@@ -5,11 +5,27 @@ require("dotenv").config({
 const mongoose = require("mongoose");
 const app = require("./app");
 const cron = require("node-cron");
+const cors = require("cors");   // ← ADD THIS
 const { generateMetrics } = require("./modules/dashboard/dashboard.service");
 const { syncSlaStatuses } = require("./modules/sla-sync/sla-sync.service");
 const { generateFaultyAnalysis } = require("./modules/faulty-analysis/faultyAnalysis.service");
 
 const PORT = process.env.PORT || 5000;
+
+
+// =====================================================
+// 🌐 ENABLE CORS (FOR FRONTEND DOMAIN)
+// =====================================================
+app.use(
+  cors({
+    origin: [
+      "https://chargezoneops.online",
+      "https://www.chargezoneops.online",
+      "http://localhost:5173"
+    ],
+    credentials: true,
+  })
+);
 
 
 // =====================================================
@@ -37,8 +53,8 @@ mongoose.connect(process.env.MONGO_URI, {
 
       console.log("CMS MongoDB Connected");
 
-      global.cmsConnection = cmsConnection;   // keep this
-      global.cmsDb = cmsConnection.db;        // add this
+      global.cmsConnection = cmsConnection;
+      global.cmsDb = cmsConnection.db;
 
       // ── Dashboard metrics (every 15 min) ────────────────────────────
       await generateMetrics();
@@ -48,17 +64,18 @@ mongoose.connect(process.env.MONGO_URI, {
       });
 
       // ── SLA Status Sync (every 1 hour) ──────────────────────────────
-      // Run once on startup, then every hour on the hour
       await syncSlaStatuses(global.coeDb, global.cmsDb);
 
       cron.schedule("0 * * * *", async () => {
         await syncSlaStatuses(global.coeDb, global.cmsDb);
       });
+
       await generateFaultyAnalysis();
 
       cron.schedule("*/30 * * * *", async () => {
         await generateFaultyAnalysis();
       });
+
       app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
       });
