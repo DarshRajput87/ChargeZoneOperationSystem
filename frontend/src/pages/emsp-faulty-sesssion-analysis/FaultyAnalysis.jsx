@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from "react";
-import api from "../../services/api";
 import "./FaultyAnalysis.css";
 
 import {
@@ -22,7 +21,6 @@ function shortReason(str = "") {
         "Tariff has been changed after session completed": "Tariff Changed",
     };
     if (map[str]) return map[str];
-    // fallback: truncate at 16 chars
     return str.length > 16 ? str.slice(0, 14) + "…" : str;
 }
 
@@ -68,7 +66,10 @@ export default function FaultyAnalysis() {
     const [panelOpen, setPanelOpen] = useState(false);
 
     useEffect(() => {
-        api.get("/faulty-analysis/recent").then(r => setRecent(r.data)).catch(() => { });
+        fetch("https://api.chargezoneops.online/faulty-analysis/recent")
+            .then(r => r.json())
+            .then(data => setRecent(data))
+            .catch(() => { });
     }, []);
 
     const allParties = useMemo(
@@ -117,7 +118,6 @@ export default function FaultyAnalysis() {
         return Object.entries(m).map(([_id, faults]) => ({ _id, faults }));
     }, [rows]);
 
-    // For bar chart: use shortform as key, keep full name for tooltip
     const reasonDist = useMemo(() => {
         const m = {};
         rows.forEach(r => (r.faulty_reasons || []).forEach(reason => {
@@ -147,7 +147,6 @@ export default function FaultyAnalysis() {
 
     const clearAll = () => { setParties([]); setPreset("today"); setDateFrom(""); setDateTo(""); };
 
-    // Custom tooltip that shows FULL reason name
     const ReasonTip = ({ active, payload }) => {
         if (!active || !payload?.length) return null;
         const d = payload[0].payload;
@@ -337,7 +336,7 @@ export default function FaultyAnalysis() {
 
             </div>
 
-            {/* ── ROW 2: Bar (VERTICAL, shortform X labels) + Stations ── */}
+            {/* ── ROW 2: Bar + Stations ── */}
             <div className="chart-grid">
 
                 <div className="chart-card">
