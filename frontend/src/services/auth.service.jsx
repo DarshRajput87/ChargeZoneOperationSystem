@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://13.232.112.152:5000/api",
+  baseURL: "https://api.chargezoneops.online/api",
 });
 
 export const loginUser = async (email, password) => {
