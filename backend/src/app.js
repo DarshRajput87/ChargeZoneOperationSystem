@@ -15,12 +15,11 @@ const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.r
 
 const app = express();
 
-app.use(cors({
-    origin: [
-        "https://www.chargezoneops.online",
-        "https://chargezoneops.online"
-    ]
-}));
+app.use(cors(
+    {
+        origin: "*",
+    }
+));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
