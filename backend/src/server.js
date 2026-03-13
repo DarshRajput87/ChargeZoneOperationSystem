@@ -7,6 +7,7 @@ const app = require("./app");
 const cron = require("node-cron");
 const { generateMetrics } = require("./modules/dashboard/dashboard.service");
 const { syncSlaStatuses } = require("./modules/sla-sync/sla-sync.service");
+const { generateFaultyAnalysis } = require("./modules/faulty-analysis/faultyAnalysis.service");
 
 const PORT = process.env.PORT || 5000;
 
@@ -53,7 +54,11 @@ mongoose.connect(process.env.MONGO_URI, {
       cron.schedule("0 * * * *", async () => {
         await syncSlaStatuses(global.coeDb, global.cmsDb);
       });
+      await generateFaultyAnalysis();
 
+      cron.schedule("*/30 * * * *", async () => {
+        await generateFaultyAnalysis();
+      });
       app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
       });

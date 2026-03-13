@@ -11,6 +11,7 @@ const settlementRoutes = require("./modules/settlement/settlement.routes");
 const inprogressAnalysisRoutes = require("./modules/inprogress-analysis/analysis.routes");
 const faultySessionRoutes = require("./modules/emsp-faulty-sessions/faultySession.routes");
 const fleetRoutes = require("./modules/fleet-management/fleet.routes");
+const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.routes");
 
 const app = express();
 
@@ -27,5 +28,7 @@ app.use("/api/settlement", settlementRoutes);
 app.use("/api/emsp-in-progress-analysis", inprogressAnalysisRoutes);
 app.use("/api/emsp-faulty-sessions", faultySessionRoutes);
 app.use("/api/fleet", fleetRoutes);
+app.use("/api/faulty-analysis", faultyAnalysisRoutes);
+
 
 module.exports = app;
