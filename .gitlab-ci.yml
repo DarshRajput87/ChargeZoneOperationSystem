@@ -5,9 +5,10 @@ deploy_backend:
   stage: deploy
   only:
     - main
+
   before_script:
     - apt-get update -y
-    - apt-get install -y openssh-client
+    - apt-get install -y openssh-client rsync
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -15,9 +16,15 @@ deploy_backend:
     - ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
 
   script:
+    - export RELEASE=$(date +%s)
+
+    - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
+
+    - rsync -avz --delete ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+
     - ssh $EC2_USER@$EC2_HOST "
-        cd $PROJECT_PATH &&
-        git pull origin main &&
-        npm install &&
-        pm2 restart server || pm2 start src/server.js --name server
+        cd $PROJECT_PATH/releases/$RELEASE &&
+        npm ci --omit=dev &&
+        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
+        pm2 reload server || pm2 start $PROJECT_PATH/current/src/server.js --name server
       "
