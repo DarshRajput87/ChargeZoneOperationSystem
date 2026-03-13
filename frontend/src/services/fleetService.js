@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://api.chargezoneops.online/api";
+const API = "http://localhost:5000/api";
 
 export const getTenants = () =>
     axios.get(`${API}/fleet/tenants`);

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "./stationExplorer.css";
 
-const BASE_URL = "https://api.chargezoneops.online/api/station-explorer";
+const BASE_URL = "http://localhost:5000/api/station-explorer";
 
 /* ─── All Indian States & UTs ─── */
 const INDIA_STATES = [

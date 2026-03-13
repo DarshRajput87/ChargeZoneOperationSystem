@@ -100,7 +100,7 @@ const Sidebar = () => {
                     </NavLink>
 
                     <NavLink
-                      to="/emsp-faulty-analysis"
+                      to="/emsp-faulty-sesssion-analysis"
                       className="submenu-item submenu-item--nested"
                     >
                       Analysis

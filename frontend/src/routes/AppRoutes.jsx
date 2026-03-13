@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
@@ -13,6 +13,7 @@ import InProgressSLA from "../pages/esmp-in_progress/InProgressSLA";
 import InProgressAnalysis from "../pages/emps-in_progress_analysis/InProgressAnalysis";
 import FaultySLA from "../pages/emps-faulty-session/FaultyDashboard";
 import FleetForm from "../pages/fleet/FleetForm";
+import FaultyAnalysis from "../pages/emsp-faulty-sesssion-analysis/FaultyAnalysis";
 
 const AppRoutes = () => {
   return (
@@ -73,6 +74,18 @@ const AppRoutes = () => {
             </DashboardLayout>
           }
         />
+
+        <Route
+          path="/emsp-faulty-sesssion-analysis"
+          element={
+            <DashboardLayout>
+              <FaultyAnalysis />
+            </DashboardLayout>
+          }
+        />
+
+        {/* Redirect old route to new route */}
+        <Route path="/emsp-faulty-analysis" element={<Navigate to="/emsp-faulty-sesssion-analysis" replace />} />
 
         <Route
           path="/emsp-CDR-Builder"
