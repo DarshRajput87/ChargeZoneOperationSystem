@@ -15,30 +15,24 @@ const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.r
 
 const app = express();
 
-const allowedOrigins = [
-    "https://www.chargezoneops.online",
-    "https://chargezoneops.online",
-    "http://localhost:5173",
-    "http://localhost:3000",
-];
+// =====================================================
+// 🌐 ENABLE CORS FOR ALL ORIGINS
+// =====================================================
 
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (e.g. mobile apps, curl, Postman)
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS: " + origin));
-        }
-    },
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
 }));
 
-// Handle preflight OPTIONS requests for all routes
+// Handle preflight requests
 app.options("*", cors());
+
 app.use(express.json());
+
+// =====================================================
+// 🚀 ROUTES
+// =====================================================
 
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
@@ -51,6 +45,5 @@ app.use("/api/emsp-in-progress-analysis", inprogressAnalysisRoutes);
 app.use("/api/emsp-faulty-sessions", faultySessionRoutes);
 app.use("/api/fleet", fleetRoutes);
 app.use("/api/faulty-analysis", faultyAnalysisRoutes);
-
 
 module.exports = app;
