@@ -19,5 +19,5 @@ deploy_backend:
         cd $PROJECT_PATH &&
         git pull origin main &&
         npm install &&
-        pm2 restart all
+        pm2 restart server || pm2 start src/server.js --name server
       "
