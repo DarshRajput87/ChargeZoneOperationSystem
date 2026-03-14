@@ -18,20 +18,16 @@ deploy_backend:
   script:
     - export RELEASE=$(date +%s)
 
-    # create release folder on EC2
+    # create release directory
     - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
 
-    # copy project files
-    - rsync -az --delete \
-      --exclude '.git' \
-      --exclude 'gitlab-deploy' \
-      --exclude 'gitlab-deploy.pub' \
-      ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+    # sync files to EC2
+    - rsync -az --delete --exclude='.git' --exclude='gitlab-deploy' --exclude='gitlab-deploy.pub' ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
 
     # install backend dependencies and restart server
     - ssh $EC2_USER@$EC2_HOST "
-      cd $PROJECT_PATH/releases/$RELEASE/backend &&
-      npm ci --omit=dev &&
-      ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
-      pm2 reload server || pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
+        cd $PROJECT_PATH/releases/$RELEASE/backend &&
+        npm ci --omit=dev &&
+        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
+        pm2 reload server || pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
       "
