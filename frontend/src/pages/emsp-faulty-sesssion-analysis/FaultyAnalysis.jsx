@@ -102,43 +102,49 @@ export default function FaultyAnalysis() {
         return true;
     }), [recent, effFrom, effTo, parties]);
 
-    // Derived charts
+    // If the current filter returned nothing but we have data, fall back to all records
+    const { isFallback, displayRows } = useMemo(() => {
+        const isFallback = rows.length === 0 && recent.length > 0;
+        return { isFallback, displayRows: isFallback ? recent : rows };
+    }, [rows, recent]);
+
+    // Derived charts — use displayRows so fallback data always renders
     const stationMap = useMemo(() => {
         const m = {};
-        rows.forEach(r => {
+        displayRows.forEach(r => {
             if (!m[r.station_name]) m[r.station_name] = { name: r.station_name, city: r.city || "—", faults: 0 };
             m[r.station_name].faults++;
         });
         return Object.values(m).sort((a, b) => b.faults - a.faults);
-    }, [rows]);
+    }, [displayRows]);
 
     const partyDist = useMemo(() => {
         const m = {};
-        rows.forEach(r => { if (r.partyId) m[r.partyId] = (m[r.partyId] || 0) + 1; });
+        displayRows.forEach(r => { if (r.partyId) m[r.partyId] = (m[r.partyId] || 0) + 1; });
         return Object.entries(m).map(([_id, faults]) => ({ _id, faults }));
-    }, [rows]);
+    }, [displayRows]);
 
     const reasonDist = useMemo(() => {
         const m = {};
-        rows.forEach(r => (r.faulty_reasons || []).forEach(reason => {
+        displayRows.forEach(r => (r.faulty_reasons || []).forEach(reason => {
             m[reason] = (m[reason] || 0) + 1;
         }));
         return Object.entries(m)
             .map(([full, count]) => ({ full, short: shortReason(full), count }))
             .sort((a, b) => b.count - a.count);
-    }, [rows]);
+    }, [displayRows]);
 
     const trendData = useMemo(() => {
         const m = {};
-        rows.forEach(r => {
+        displayRows.forEach(r => {
             const d = r.created_at?.slice(0, 10);
             if (d) m[d] = (m[d] || 0) + 1;
         });
         return Object.entries(m).sort(([a], [b]) => a.localeCompare(b))
             .map(([_id, faults]) => ({ _id, faults }));
-    }, [rows]);
+    }, [displayRows]);
 
-    const total = rows.length;
+    const total = displayRows.length;
     const avgF = stationMap.length ? (total / stationMap.length).toFixed(1) : "0";
     const active = parties.length + (preset !== "today" ? 1 : 0);
 
@@ -190,6 +196,25 @@ export default function FaultyAnalysis() {
                     {active > 0 && <span className="filter-count-badge">{active}</span>}
                 </button>
             </div>
+
+            {/* ── FALLBACK NOTICE ── */}
+            {isFallback && (
+                <div style={{
+                    background: "rgba(251,191,36,0.08)",
+                    border: "1px solid rgba(251,191,36,0.3)",
+                    borderRadius: 8,
+                    padding: "8px 14px",
+                    marginBottom: 12,
+                    fontSize: 13,
+                    color: "#fbbf24",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8
+                }}>
+                    <span>⚠️</span>
+                    <span>No data found for the selected period — showing all available records instead.</span>
+                </div>
+            )}
 
             {/* ── FILTER PANEL ── */}
             <div className={`filter-panel ${panelOpen ? "open" : ""}`}>
