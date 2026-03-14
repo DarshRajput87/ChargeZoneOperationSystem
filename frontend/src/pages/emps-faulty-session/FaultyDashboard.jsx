@@ -3,9 +3,9 @@ import axios from "axios";
 import EVLoader from "../Dashboard/EVLoader";
 import "./FaultySLA.css";
 
-const BASE_URL = "http://localhost:5000/api/emsp-faulty-sessions";
-const SETTLEMENT_PREVIEW = "http://localhost:5000/api/settlement/preview";
-const SETTLEMENT_PUSH = "http://localhost:5000/api/settlement/push";
+const BASE_URL = "https://api.chargezoneops.online/api/emsp-faulty-sessions";
+const SETTLEMENT_PREVIEW = "https://api.chargezoneops.online/api/settlement/preview";
+const SETTLEMENT_PUSH = "https://api.chargezoneops.online/api/settlement/push";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // helpers

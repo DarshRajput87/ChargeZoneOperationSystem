@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import "./InProgressAnalysis.css";
 
-const BASE_URL = "http://localhost:5000/api/emsp-in-progress-analysis";
+const BASE_URL = "https://api.chargezoneops.online/api/emsp-in-progress-analysis";
 const SPARK_DATA = [1, 2, 1, 3, 2, 3, 4, 3, 5, 3, 4, 3];
 
 // ── Helpers ────────────────────────────────────────────────────────────────

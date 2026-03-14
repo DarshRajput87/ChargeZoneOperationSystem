@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/station-explorer";
+const BASE_URL = "https://api.chargezoneops.online/api/station-explorer";
 
 export const fetchStations = async (search = "", page = 1, limit = 10) => {
   const res = await axios.get(BASE_URL, {
