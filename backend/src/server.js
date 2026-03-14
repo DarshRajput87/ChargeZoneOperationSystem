@@ -76,4 +76,4 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error("MongoDB connection error:", err);
   });
 
-console.log("Deployment test");
+console.log("Deployment TEST");
