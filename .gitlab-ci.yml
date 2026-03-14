@@ -13,18 +13,25 @@ deploy_backend:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
+    - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
 
   script:
     - export RELEASE=$(date +%s)
 
+    # create release folder on EC2
     - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
 
-    - rsync -avz --delete ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+    # copy project files
+    - rsync -az --delete \
+      --exclude '.git' \
+      --exclude 'gitlab-deploy' \
+      --exclude 'gitlab-deploy.pub' \
+      ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
 
+    # install backend dependencies and restart server
     - ssh $EC2_USER@$EC2_HOST "
-        cd $PROJECT_PATH/releases/$RELEASE &&
-        npm ci --omit=dev &&
-        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
-        pm2 reload server || pm2 start $PROJECT_PATH/current/src/server.js --name server
+      cd $PROJECT_PATH/releases/$RELEASE/backend &&
+      npm ci --omit=dev &&
+      ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
+      pm2 reload server || pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
       "
