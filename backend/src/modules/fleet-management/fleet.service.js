@@ -42,7 +42,7 @@ exports.getOcpiClients = async () => {
     .find({
       is_fleet_details_supported: true,
       deleted: false,
-      tenant_id: new ObjectId("62987db08f88870e6524d06a")
+      tenant: new ObjectId("62987db08f88870e6524d06a")
     })
     .project({
       partyId: 1,
