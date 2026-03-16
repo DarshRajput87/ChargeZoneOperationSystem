@@ -41,7 +41,8 @@ exports.getOcpiClients = async () => {
   return await ocpi
     .find({
       is_fleet_details_supported: true,
-      deleted: false
+      deleted: false,
+      tenant_id: "62987db08f88870e6524d06a"
     })
     .project({
       partyId: 1,
