@@ -1133,18 +1133,161 @@
   }
 }
 
-/* Modal variants */
-.ipsl-modal-view .ipsl-modal-header h3 {
-  color: #93c5fd;
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Large tablets (768px - 1199px) */
+@media (max-width: 1199px) {
+  .ipsl-page {
+    padding: 24px 32px 40px;
+  }
+
+  .ipsl-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ipsl-modal-content {
+    width: 90vw;
+  }
 }
 
-.ipsl-modal-settle .ipsl-modal-header h3 {
-  color: #f87171;
+/* Tablets and large phones (480px - 767px) */
+@media (max-width: 767px) {
+  .ipsl-page {
+    padding: 20px 20px 32px;
+  }
+
+  .ipsl-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .ipsl-stats {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .ipsl-stat-pill {
+    padding: 0 16px;
+  }
+
+  .ipsl-stat-num {
+    font-size: 18px;
+  }
+
+  .ipsl-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ipsl-search-wrap {
+    max-width: none;
+  }
+
+  .ipsl-table-wrap {
+    overflow-x: auto;
+  }
+
+  .ipsl-table {
+    min-width: 700px;
+  }
+
+  .ipsl-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ipsl-modal-content {
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .ipsl-modal-header {
+    padding: 16px 20px;
+  }
+
+  .ipsl-settle-identity {
+    flex-direction: column;
+  }
+
+  .ipsl-id-chip {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ipsl-id-chip:last-child {
+    border-bottom: none;
+  }
+
+  .ipsl-detail-row {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
 }
 
-.ipsl-modal-view,
-.ipsl-modal-settle {
-  min-width: min(600px, 92vw);
+/* Small phones (< 480px) */
+@media (max-width: 479px) {
+  .ipsl-page {
+    padding: 16px 16px 24px;
+  }
+
+  .ipsl-page-title {
+    font-size: 18px;
+  }
+
+  .ipsl-title-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .ipsl-stats {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .ipsl-stat-pill {
+    padding: 0 12px;
+  }
+
+  .ipsl-stat-divider {
+    display: none;
+  }
+
+  .ipsl-table th,
+  .ipsl-table td {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .ipsl-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .ipsl-btn-settle,
+  .ipsl-btn-view {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .ipsl-modal-header h3 {
+    font-size: 14px;
+  }
+
+  .ipsl-modal-x {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ipsl-flat-card {
+    padding: 8px 10px;
+  }
+
+  .ipsl-flat-card-value {
+    font-size: 11px;
+  }
 }
 
 /* Detail grid */
