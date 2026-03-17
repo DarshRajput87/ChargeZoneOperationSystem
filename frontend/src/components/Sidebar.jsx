@@ -34,7 +34,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         <NavLink to="/simulator" onClick={onClose}>Charger Simulator</NavLink>
 
         {/* EMSP MODULE */}
-        <div className="menu-module">
+        <div className={`menu-module${openModule === "emsp" ? " open" : ""}`}>
 
           <div
             className="module-title"
@@ -133,7 +133,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* CPO MODULE */}
-        <div className="menu-module">
+        <div className={`menu-module${openModule === "cpo" ? " open" : ""}`}>
 
           <div
             className="module-title"

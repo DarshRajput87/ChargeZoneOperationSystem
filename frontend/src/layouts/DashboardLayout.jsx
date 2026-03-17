@@ -7,7 +7,7 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="dashboard-container">
-      {/* Overlay backdrop — closes sidebar when tapped on mobile */}
+      {/* Mobile overlay backdrop */}
       {sidebarOpen && (
         <div
           className="sidebar-overlay"
@@ -18,7 +18,7 @@ const DashboardLayout = ({ children }) => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="main-section">
-        <Topbar onMenuToggle={() => setSidebarOpen(true)} />
+        <Topbar onMenuToggle={() => setSidebarOpen((prev) => !prev)} />
         <div className="content">{children}</div>
       </div>
     </div>
