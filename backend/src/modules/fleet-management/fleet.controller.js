@@ -11,8 +11,20 @@ exports.getTenants = async (req, res) => {
 
 exports.getOcpiClients = async (req, res) => {
     try {
-        const data = await fleetService.getOcpiClients();
+        const { tenant_id } = req.query;
+        const data = await fleetService.getOcpiClients({ tenant_id });
         res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getExistingFleets = async (req, res) => {
+    try {
+        const { tenant_id } = req.query;
+        if (!tenant_id) return res.status(400).json({ error: "tenant_id is required" });
+        const names = await fleetService.getExistingFleets({ tenant_id });
+        res.json({ names });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-const Topbar = () => {
+const Topbar = ({ onMenuToggle }) => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,6 +30,15 @@ const Topbar = () => {
 
   return (
     <div className="topbar">
+      {/* Hamburger — only visible on mobile */}
+      <button
+        className="topbar-menu-btn"
+        onClick={onMenuToggle}
+        aria-label="Toggle menu"
+      >
+        ☰
+      </button>
+
       <div className="topbar-title">
         ChargeZone Operations {getPageName() && ` / ${getPageName()}`}
       </div>

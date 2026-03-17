@@ -900,3 +900,190 @@
   color: var(--text-2);
   font-weight: 600;
 }
+
+/* ══════════════════════════════════════
+   RESPONSIVE STYLES
+══════════════════════════════════════ */
+
+/* Large tablets (768px - 1199px) */
+@media (max-width: 1199px) {
+  .station-page {
+    padding: 24px 20px;
+  }
+
+  .search-wrap input {
+    width: 220px;
+  }
+
+  .charger-card {
+    width: 160px;
+    min-width: 160px;
+  }
+}
+
+/* Tablets and large phones (480px - 767px) */
+@media (max-width: 767px) {
+  .station-page {
+    padding: 20px 16px;
+  }
+
+  .station-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    min-width: 200px;
+  }
+
+  .filter-select {
+    min-width: 120px;
+  }
+
+  .table-header,
+  .table-row {
+    grid-template-columns: 2fr 1fr 1fr 0.8fr 1.4fr;
+    padding: 10px 16px;
+  }
+
+  .cell-name {
+    font-size: 12px;
+  }
+
+  .cell-mono {
+    font-size: 11px;
+  }
+
+  .charger-card {
+    width: 150px;
+    min-width: 150px;
+    padding: 12px;
+  }
+
+  .charger-id {
+    font-size: 11px;
+  }
+
+  .charger-tariff {
+    font-size: 13px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+/* Small phones (< 480px) */
+@media (max-width: 479px) {
+  .station-page {
+    padding: 16px 12px;
+  }
+
+  .station-header h2 {
+    font-size: 18px;
+  }
+
+  .header-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-sub {
+    font-size: 11px;
+  }
+
+  .header-controls {
+    gap: 8px;
+  }
+
+  .search-wrap input {
+    padding: 8px 30px 8px 30px;
+    font-size: 12px;
+  }
+
+  .filter-select {
+    padding: 8px 24px 8px 26px;
+    font-size: 12px;
+    min-width: 100px;
+  }
+
+  .filter-tags {
+    margin-bottom: 12px;
+  }
+
+  .filter-tag {
+    font-size: 11px;
+    padding: 3px 8px 3px 10px;
+  }
+
+  .station-table-wrap {
+    overflow-x: auto;
+  }
+
+  .station-table {
+    min-width: 600px;
+  }
+
+  .table-header {
+    padding: 10px 14px;
+    font-size: 9px;
+  }
+
+  .table-row {
+    padding: 12px 14px;
+  }
+
+  .cell-name {
+    font-size: 11px;
+  }
+
+  .cell-mono {
+    font-size: 10px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    padding: 3px 8px 3px 6px;
+  }
+
+  .action-buttons {
+    gap: 6px;
+  }
+
+  .btn-copy {
+    width: 28px;
+    height: 28px;
+  }
+
+  .btn-charger {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .charger-panel {
+    padding: 14px 16px;
+  }
+
+  .charger-card {
+    width: 140px;
+    min-width: 140px;
+    padding: 10px 12px;
+  }
+
+  .btn-page {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .page-info {
+    font-size: 12px;
+  }
+}

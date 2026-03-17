@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import logo from "../assets/Logo.png";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   const [openModule, setOpenModule] = useState(null);
   const [openSubMenu, setOpenSubMenu] = useState(null);
 
@@ -17,18 +17,21 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar${isOpen ? " sidebar-open" : ""}`}>
 
       <div className="sidebar-logo">
         <img src={logo} alt="logo" />
+        {/* Close button — only visible on mobile */}
+        <button className="sidebar-close-btn" onClick={onClose} aria-label="Close menu">✕</button>
       </div>
 
       <nav>
 
         {/* Dashboard */}
-        <NavLink to="/dashboard">Dashboard</NavLink>
-        <NavLink to="/station-explorer">Station Explorer</NavLink>
-        <NavLink to="/fleet">Fleet</NavLink>
+        <NavLink to="/dashboard" onClick={onClose}>Dashboard</NavLink>
+        <NavLink to="/station-explorer" onClick={onClose}>Station Explorer</NavLink>
+        <NavLink to="/fleet" onClick={onClose}>Fleet</NavLink>
+        <NavLink to="/simulator" onClick={onClose}>Charger Simulator</NavLink>
 
         {/* EMSP MODULE */}
         <div className="menu-module">
@@ -62,6 +65,7 @@ const Sidebar = () => {
                     <NavLink
                       to="/emsp-in-progress"
                       className="submenu-item submenu-item--nested"
+                      onClick={onClose}
                     >
                       Sessions
                     </NavLink>
@@ -69,6 +73,7 @@ const Sidebar = () => {
                     <NavLink
                       to="/emsp-in-progress-analysis"
                       className="submenu-item submenu-item--nested"
+                      onClick={onClose}
                     >
                       Analysis
                     </NavLink>
@@ -95,6 +100,7 @@ const Sidebar = () => {
                     <NavLink
                       to="/emsp-faulty-sessions"
                       className="submenu-item submenu-item--nested"
+                      onClick={onClose}
                     >
                       Sessions
                     </NavLink>
@@ -102,6 +108,7 @@ const Sidebar = () => {
                     <NavLink
                       to="/emsp-faulty-sesssion-analysis"
                       className="submenu-item submenu-item--nested"
+                      onClick={onClose}
                     >
                       Analysis
                     </NavLink>
@@ -115,6 +122,7 @@ const Sidebar = () => {
               <NavLink
                 to="/emsp-CDR-Builder"
                 className="submenu-item"
+                onClick={onClose}
               >
                 CDR Builder
               </NavLink>
@@ -136,7 +144,7 @@ const Sidebar = () => {
 
           {openModule === "cpo" && (
             <div className="submenu">
-              <NavLink to="/cpo-CDR-Push" className="submenu-item">
+              <NavLink to="/cpo-CDR-Push" className="submenu-item" onClick={onClose}>
                 CDR Push
               </NavLink>
             </div>
@@ -145,9 +153,9 @@ const Sidebar = () => {
         </div>
 
         {/* Other Modules */}
-        <NavLink to="/reports">Reports</NavLink>
-        <NavLink to="/analysis">Analysis</NavLink>
-        <NavLink to="/settings">Settings</NavLink>
+        <NavLink to="/reports" onClick={onClose}>Reports</NavLink>
+        <NavLink to="/analysis" onClick={onClose}>Analysis</NavLink>
+        <NavLink to="/settings" onClick={onClose}>Settings</NavLink>
 
       </nav>
     </div>

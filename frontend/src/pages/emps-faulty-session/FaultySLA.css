@@ -1130,3 +1130,167 @@
         transform: rotate(360deg);
     }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Large tablets (768px - 1199px) */
+@media (max-width: 1199px) {
+    .fsla-page {
+        padding: 28px 36px 48px;
+    }
+
+    .fsla-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fsla-modal-content {
+        width: 85vw;
+    }
+}
+
+/* Tablets and large phones (480px - 767px) */
+@media (max-width: 767px) {
+    .fsla-page {
+        padding: 20px 24px 36px;
+    }
+
+    .fsla-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .fsla-stats {
+        width: 100%;
+        justify-content: space-around;
+        gap: 12px;
+    }
+
+    .fsla-stat-pill {
+        align-items: center;
+    }
+
+    .fsla-table-wrap {
+        overflow-x: auto;
+    }
+
+    .fsla-table {
+        min-width: 650px;
+    }
+
+    .fsla-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fsla-modal-content {
+        width: 95vw;
+        max-height: 95vh;
+    }
+
+    .fsla-modal-header {
+        padding: 18px 22px;
+    }
+
+    .fsla-settle-identity {
+        flex-direction: column;
+    }
+
+    .fsla-id-chip {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .fsla-id-chip:last-child {
+        border-bottom: none;
+    }
+
+    .fsla-detail-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .fsla-method-card {
+        padding: 14px;
+    }
+
+    .fsla-method-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* Small phones (< 480px) */
+@media (max-width: 479px) {
+    .fsla-page {
+        padding: 16px 16px 28px;
+    }
+
+    .fsla-page-title {
+        font-size: 20px;
+    }
+
+    .fsla-title-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .fsla-stats {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fsla-stat-divider {
+        display: none;
+    }
+
+    .fsla-stat-num {
+        font-size: 18px;
+    }
+
+    .fsla-table th,
+    .fsla-table td {
+        padding: 12px 14px;
+        font-size: 11px;
+    }
+
+    .fsla-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .fsla-btn-settle,
+    .fsla-btn-view {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+
+    .fsla-modal-header h3 {
+        font-size: 15px;
+    }
+
+    .fsla-modal-x {
+        width: 26px;
+        height: 26px;
+    }
+
+    .fsla-flat-card {
+        padding: 10px 12px;
+    }
+
+    .fsla-flat-card-value {
+        font-size: 11px;
+    }
+
+    .fsla-method-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .fsla-method-arrow {
+        display: none;
+    }
+}

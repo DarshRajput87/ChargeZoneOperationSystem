@@ -1332,3 +1332,199 @@
 ::-webkit-scrollbar-thumb:hover {
     background: var(--btn-primary);
 }
+
+/* ══════════════════════════════════════
+   RESPONSIVE STYLES
+══════════════════════════════════════ */
+
+/* Large tablets (768px - 1199px) */
+@media (max-width: 1199px) {
+    .fp {
+        padding: 36px 40px 60px;
+        max-width: 100%;
+    }
+
+    .fp__fleet-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .pm {
+        max-width: 90vw;
+    }
+}
+
+/* Tablets and large phones (480px - 767px) */
+@media (max-width: 767px) {
+    .fp {
+        padding: 28px 24px 48px;
+    }
+
+    .fp__title {
+        font-size: 28px;
+    }
+
+    .fp__card {
+        padding: 20px 22px;
+    }
+
+    .fp__fleet-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .fp__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .fp__actions> :last-child {
+        margin-left: 0;
+    }
+
+    .pm {
+        max-width: 95vw;
+    }
+
+    .pm__header {
+        padding: 16px 20px;
+    }
+
+    .pm__table-wrap {
+        padding: 16px 20px;
+    }
+
+    .pm__footer {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 20px;
+    }
+
+    .pm__footer-left,
+    .pm__footer-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .sdd__panel {
+        max-height: 200px;
+    }
+}
+
+/* Small phones (< 480px) */
+@media (max-width: 479px) {
+    .fp {
+        padding: 20px 16px 36px;
+    }
+
+    .fp__title {
+        font-size: 24px;
+    }
+
+    .fp__sub {
+        font-size: 12px;
+    }
+
+    .fp__card {
+        padding: 16px 18px;
+    }
+
+    .fp__card-label {
+        font-size: 10px;
+    }
+
+    .fp__toggle-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .fp__fleet-row {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 0;
+    }
+
+    .fp__fleet-num {
+        padding-top: 0;
+        text-align: left;
+    }
+
+    .fp__fleet-fields {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .fp__field-label {
+        font-size: 9px;
+    }
+
+    .fp__input {
+        font-size: 12px;
+        padding: 8px 11px;
+    }
+
+    .fp__fleet-remove {
+        margin-top: 0;
+        align-self: flex-end;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 10px 18px;
+    }
+
+    .fp__toast {
+        left: 16px;
+        right: 16px;
+        top: auto;
+        bottom: 16px;
+        max-width: none;
+        width: auto;
+    }
+
+    .pm__header {
+        padding: 14px 16px;
+    }
+
+    .pm__title {
+        font-size: 13px;
+    }
+
+    .pm__subtitle {
+        font-size: 11px;
+    }
+
+    .pm__tabs {
+        padding: 0 16px;
+        overflow-x: auto;
+    }
+
+    .pm__tab {
+        padding: 10px 12px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .pm__table-wrap {
+        padding: 12px 16px;
+    }
+
+    .pm__th,
+    .pm__td {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .pm__json-editor {
+        font-size: 11px;
+        padding: 12px;
+        min-height: 200px;
+    }
+
+    .sdd__wrap {
+        min-height: 38px;
+        padding: 0 10px;
+    }
+
+    .sdd__input {
+        font-size: 12px;
+    }
+}

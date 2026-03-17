@@ -553,3 +553,67 @@
     font-size: 24px;
   }
 }
+
+/* Small phones (< 480px) */
+@media (max-width: 479px) {
+  .cdr-page {
+    padding: 16px 12px 40px;
+  }
+
+  .cdr-page-header {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .cdr-title {
+    font-size: 22px;
+  }
+
+  .cdr-subtitle {
+    font-size: 12px;
+  }
+
+  .cdr-card {
+    padding: 14px 12px;
+  }
+
+  .cdr-card-label {
+    font-size: 9px;
+  }
+
+  .cdr-input {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .cdr-btn {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .cdr-btn-full {
+    padding: 12px;
+  }
+
+  .cdr-status-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cdr-json-viewer {
+    max-height: 280px;
+  }
+
+  .cdr-json-pre {
+    padding: 12px 14px;
+    font-size: 11px;
+  }
+
+  .cdr-log-main {
+    padding: 8px 12px;
+  }
+
+  .cdr-log-msg {
+    font-size: 12px;
+  }
+}
