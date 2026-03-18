@@ -12,6 +12,7 @@ const inprogressAnalysisRoutes = require("./modules/inprogress-analysis/analysis
 const faultySessionRoutes = require("./modules/emsp-faulty-sessions/faultySession.routes");
 const fleetRoutes = require("./modules/fleet-management/fleet.routes");
 const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.routes");
+const simulatorRoutes = require("./modules/Charger Simulator/simulator.routes");
 
 const app = express();
 
