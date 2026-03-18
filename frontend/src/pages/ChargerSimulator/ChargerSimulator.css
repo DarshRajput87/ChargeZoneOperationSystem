@@ -1,0 +1,780 @@
+/* ============================================================
+   ChargerSimulator.css
+   Matches ChargeZone design system exactly.
+   Uses app-level variables when available, re-declares them
+   locally so the component is self-contained.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap');
+
+/* ── Design tokens (mirror the app's variables) ─────────── */
+.cs-root {
+    --bg: #080f1a;
+    --surface: #0c1525;
+    --card: #101e30;
+    --card-hover: #13233a;
+    --border: rgba(255, 255, 255, 0.07);
+    --border-md: rgba(255, 255, 255, 0.11);
+    --accent: #e8303a;
+    --accent-bg: rgba(232, 48, 58, 0.10);
+    --accent-glow: rgba(232, 48, 58, 0.22);
+    --text: #e2ecf7;
+    --muted: #5e7a94;
+    --muted-md: #8ba0b8;
+    --font: 'DM Sans', sans-serif;
+    --font-display: 'Syne', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --transition: 0.18s ease;
+
+    /* Status colours */
+    --green: #22c55e;
+    --green-bg: rgba(34, 197, 94, 0.10);
+    --green-border: rgba(34, 197, 94, 0.25);
+    --amber: #f59e0b;
+    --amber-bg: rgba(245, 158, 11, 0.10);
+    --amber-border: rgba(245, 158, 11, 0.25);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59, 130, 246, 0.10);
+    --blue-border: rgba(59, 130, 246, 0.25);
+    --cyan: #06b6d4;
+    --cyan-bg: rgba(6, 182, 212, 0.10);
+    --cyan-border: rgba(6, 182, 212, 0.25);
+    --purple: #a855f7;
+    --purple-bg: rgba(168, 85, 247, 0.10);
+
+    /* Layout */
+    --left-w: 460px;
+    --gap: 16px;
+    --card-pad: 20px;
+}
+
+/* ── Root shell: fills the space the parent route gives it ─ */
+.cs-root {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    width: 100%;
+    height: 100%;
+    /* parent controls the height */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════════════════════════════════
+   TWO-COLUMN LAYOUT
+   Left = scrollable controls, Right = sticky console
+   ════════════════════════════════════════════════════════ */
+.cs-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ── Left panel ─────────────────────────────────────────── */
+.cs-left {
+    width: var(--left-w);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 16px 32px 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid var(--border);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+}
+
+.cs-left::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cs-left::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cs-left::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+/* ── Right panel ────────────────────────────────────────── */
+.cs-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 20px 20px 16px;
+    overflow: hidden;
+    min-width: 0;
+}
+
+/* Console card fills the full right panel */
+.cs-console-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* ════════════════════════════════════════════════════════
+   CARDS
+   ════════════════════════════════════════════════════════ */
+.cs-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--card-pad);
+    position: relative;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.cs-card:hover {
+    border-color: var(--border-md);
+    background: var(--card-hover);
+}
+
+/* Card header row */
+.cs-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.cs-card-header h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    flex: 1;
+}
+
+.cs-card-icon {
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+/* TX badge on meter card */
+.cs-tx-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    animation: txBlink 2s step-end infinite;
+}
+
+@keyframes txBlink {
+
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0.35;
+    }
+}
+
+/* ════════════════════════════════════════════════════════
+   FORM FIELDS
+   ════════════════════════════════════════════════════════ */
+.cs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.cs-field:last-of-type {
+    margin-bottom: 0;
+}
+
+.cs-field label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Unit badge next to label */
+.cs-unit {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--cyan);
+    background: var(--cyan-bg);
+    border: 1px solid var(--cyan-border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 400;
+}
+
+/* Field row: name + count */
+.cs-field-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.cs-field-row .cs-field {
+    margin-bottom: 0;
+}
+
+.cs-field-grow {
+    flex: 1;
+}
+
+.cs-field-fixed {
+    flex: 0 0 110px;
+}
+
+/* Meter 2×3 grid */
+.cs-meter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 12px;
+    margin-bottom: 14px;
+}
+
+.cs-meter-grid .cs-field {
+    margin-bottom: 10px;
+}
+
+/* ── Inputs ─────────────────────────────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]) {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    caret-color: var(--accent);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"])::placeholder {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):focus {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+}
+
+/* ── Select ─────────────────────────────────────────────── */
+select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 9px 34px 9px 12px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235e7a94' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color var(--transition);
+}
+
+select:focus {
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+}
+
+select option {
+    background: var(--surface);
+    color: var(--text);
+}
+
+/* ════════════════════════════════════════════════════════
+   BUTTONS
+   ════════════════════════════════════════════════════════ */
+.cs-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition),
+        box-shadow var(--transition), transform 0.1s ease;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cs-btn:active {
+    transform: scale(0.97);
+}
+
+/* Primary — accent red (matches app's main CTA) */
+.cs-btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 2px 12px var(--accent-glow);
+    margin-top: 4px;
+}
+
+.cs-btn-primary:hover {
+    background: #c5252e;
+    border-color: #c5252e;
+    box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+/* Green — Start */
+.cs-btn-green {
+    background: var(--green-bg);
+    color: var(--green);
+    border-color: var(--green-border);
+}
+
+.cs-btn-green:hover {
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.45);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+}
+
+/* Danger — Stop */
+.cs-btn-danger {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-color: rgba(232, 48, 58, 0.3);
+}
+
+.cs-btn-danger:hover {
+    background: rgba(232, 48, 58, 0.18);
+    border-color: rgba(232, 48, 58, 0.5);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Ghost — fault item Send */
+.cs-btn-ghost {
+    background: transparent;
+    color: var(--muted-md);
+    border-color: var(--border-md);
+    font-size: 12px;
+}
+
+.cs-btn-ghost:hover {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Small */
+.cs-btn-sm {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+}
+
+/* Full-width */
+.cs-btn-full {
+    width: 100%;
+}
+
+/* Side-by-side button row */
+.cs-btn-row {
+    display: flex;
+    gap: 10px;
+}
+
+.cs-btn-row .cs-btn {
+    flex: 1;
+}
+
+/* ════════════════════════════════════════════════════════
+   FAULT PILLS  (toggle checkboxes as pill buttons)
+   ════════════════════════════════════════════════════════ */
+.cs-fault-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.cs-pill {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-md);
+    background: transparent;
+    color: var(--muted-md);
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+    /* Override global btn margins */
+    margin-top: 0;
+    min-height: auto;
+}
+
+.cs-pill:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: none;
+}
+
+.cs-pill-active {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-color: rgba(232, 48, 58, 0.35);
+}
+
+.cs-pill-active:hover {
+    background: rgba(232, 48, 58, 0.18);
+    box-shadow: none;
+}
+
+/* ════════════════════════════════════════════════════════
+   FAULT ITEM LIST
+   ════════════════════════════════════════════════════════ */
+.cs-fault-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.cs-fault-item:last-child {
+    margin-bottom: 0;
+}
+
+.cs-fault-item:hover {
+    border-color: var(--border-md);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.cs-fault-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cs-fault-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cs-fault-types {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Empty state */
+.cs-empty {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 16px 0 4px;
+}
+
+/* ════════════════════════════════════════════════════════
+   OCPP CONSOLE
+   ════════════════════════════════════════════════════════ */
+
+/* Live indicator dot */
+.cs-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+    flex-shrink: 0;
+    animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+    }
+
+    50% {
+        opacity: 0.4;
+        box-shadow: none;
+    }
+}
+
+/* Scrollable log window fills the console card */
+.cs-log-window {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+}
+
+.cs-log-window::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cs-log-window::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cs-log-window::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+/* Individual log entry */
+.cs-log {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    border-left-width: 3px;
+    padding: 10px 12px;
+    animation: logSlide 0.2s ease both;
+    flex-shrink: 0;
+}
+
+@keyframes logSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Log meta row: time + tag */
+.cs-log-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.cs-log-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.cs-log-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.cs-log-body {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--muted-md);
+}
+
+/* ── Log type colours ───────────────────────────────────── */
+
+/* IN — cyan */
+.cs-log-in {
+    border-left-color: var(--cyan);
+    background: rgba(6, 182, 212, 0.04);
+}
+
+.cs-log-in .cs-log-tag {
+    background: var(--cyan-bg);
+    color: var(--cyan);
+    border: 1px solid var(--cyan-border);
+}
+
+.cs-log-in .cs-log-body {
+    color: rgba(6, 182, 212, 0.8);
+}
+
+/* OUT — amber */
+.cs-log-out {
+    border-left-color: var(--amber);
+    background: var(--amber-bg);
+}
+
+.cs-log-out .cs-log-tag {
+    background: var(--amber-bg);
+    color: var(--amber);
+    border: 1px solid var(--amber-border);
+}
+
+.cs-log-out .cs-log-body {
+    color: rgba(245, 158, 11, 0.8);
+}
+
+/* SYSTEM — purple */
+.cs-log-system {
+    border-left-color: var(--purple);
+    background: var(--purple-bg);
+}
+
+.cs-log-system .cs-log-tag {
+    background: var(--purple-bg);
+    color: var(--purple);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.cs-log-system .cs-log-body {
+    color: rgba(168, 85, 247, 0.8);
+}
+
+/* ERR / ERROR — red */
+.cs-log-err,
+.cs-log-error {
+    border-left-color: var(--accent);
+    background: var(--accent-bg);
+}
+
+.cs-log-err .cs-log-tag,
+.cs-log-error .cs-log-tag {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid rgba(232, 48, 58, 0.3);
+}
+
+.cs-log-err .cs-log-body,
+.cs-log-error .cs-log-body {
+    color: rgba(232, 48, 58, 0.8);
+}
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════ */
+
+/* Tablet and smaller: stack vertically */
+@media (max-width: 900px) {
+    .cs-root {
+        height: auto;
+    }
+
+    .cs-layout {
+        flex-direction: column;
+        overflow: auto;
+        height: auto;
+    }
+
+    .cs-left {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        overflow: visible;
+        padding: 16px 16px 24px;
+    }
+
+    .cs-right {
+        padding: 16px;
+        height: auto;
+    }
+
+    .cs-console-card,
+    .cs-log-window {
+        flex: unset;
+        min-height: unset;
+        height: 360px;
+    }
+
+    .cs-meter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Large desktop: widen left panel */
+@media (min-width: 1400px) {
+    .cs-root {
+        --left-w: 520px;
+    }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .cs-btn {
+        min-height: 44px;
+    }
+
+    input,
+    select {
+        min-height: 44px;
+    }
+
+    .cs-pill {
+        min-height: 36px;
+        padding: 8px 12px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

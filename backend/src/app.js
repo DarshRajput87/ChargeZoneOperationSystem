@@ -45,5 +45,6 @@ app.use("/api/emsp-in-progress-analysis", inprogressAnalysisRoutes);
 app.use("/api/emsp-faulty-sessions", faultySessionRoutes);
 app.use("/api/fleet", fleetRoutes);
 app.use("/api/faulty-analysis", faultyAnalysisRoutes);
+app.use("/api/simulator", simulatorRoutes);
 
 module.exports = app;
