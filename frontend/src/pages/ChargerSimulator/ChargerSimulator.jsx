@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import logo from "../assets/Logo.png";
+import logo from "../../assets/Logo.png";
 
 const Sidebar = ({ isOpen, onClose }) => {
     const [openModule, setOpenModule] = useState(null);
