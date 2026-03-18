@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000/api/simulator";
+const API = "https://api.chargezoneops.online/api/simulator";
 
 export const connectCharger = (wsUrl) =>
     axios.post(`${API}/connect`, { wsUrl });

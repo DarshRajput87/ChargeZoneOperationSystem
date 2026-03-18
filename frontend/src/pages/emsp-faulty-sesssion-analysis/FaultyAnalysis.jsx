@@ -66,7 +66,7 @@ export default function FaultyAnalysis() {
     const [panelOpen, setPanelOpen] = useState(false);
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/faulty-analysis/recent")
+        fetch("https://api.chargezoneops.online/api/faulty-analysis/recent")
             .then(r => r.json())
             .then(data => setRecent(data))
             .catch(() => { });
