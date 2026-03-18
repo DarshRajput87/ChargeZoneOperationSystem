@@ -24,6 +24,8 @@ const pushLog = (type, message) => {
 
 exports.getLogs = () => logs;
 
+exports.clearLogs = () => { logs = []; };
+
 /* ───────── FAULT SCENARIO SERVICES ───────── */
 
 exports.listFaultScenarios = async () => {

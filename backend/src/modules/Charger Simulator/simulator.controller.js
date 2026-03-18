@@ -71,11 +71,17 @@ exports.sendMeterValues = async (req, res) => {
 /* ───────── LOGS ───────── */
 exports.getLogs = (req, res) => {
     try {
-
         const logs = simulator.getLogs();
-
         res.json(logs);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
+exports.clearLogs = (req, res) => {
+    try {
+        simulator.clearLogs();
+        res.json({ status: "Logs cleared" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

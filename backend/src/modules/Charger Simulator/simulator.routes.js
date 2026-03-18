@@ -14,6 +14,7 @@ router.post("/meter/values", controller.sendMeterValues);
 
 /* ✅ LOGS ROUTE */
 router.get("/logs", controller.getLogs);
+router.delete("/logs", controller.clearLogs);
 
 /* ✅ FAULT SCENARIO ROUTES */
 router.get("/fault/list", controller.listFaults);
