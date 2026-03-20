@@ -28,3 +28,6 @@ export const sendFaultScenario = (id) =>
 
 export const sendMeterValues = (payload) =>
     axios.post(`${API}/meter/values`, payload);
+
+export const clearLogs = () =>
+    axios.delete(`${API}/logs`);

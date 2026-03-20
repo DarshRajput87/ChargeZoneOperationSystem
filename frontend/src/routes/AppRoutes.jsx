@@ -15,6 +15,7 @@ import FaultySLA from "../pages/emps-faulty-session/FaultyDashboard";
 import FleetForm from "../pages/fleet/FleetForm";
 import FaultyAnalysis from "../pages/emsp-faulty-sesssion-analysis/FaultyAnalysis";
 import ChargerSimulator from "../pages/ChargerSimulator/ChargerSimulator";
+import OCPIAnalysis from "../pages/OCPI-Analysis/OCPI-Analysis";
 
 const AppRoutes = () => {
   return (
@@ -108,6 +109,15 @@ const AppRoutes = () => {
           element={
             <DashboardLayout>
               <CDR_PUSH />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/analysis"
+          element={
+            <DashboardLayout>
+              <OCPIAnalysis />
             </DashboardLayout>
           }
         />

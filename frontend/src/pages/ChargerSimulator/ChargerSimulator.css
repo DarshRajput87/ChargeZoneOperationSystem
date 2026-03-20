@@ -4,9 +4,6 @@
    Uses app-level variables when available, re-declares them
    locally so the component is self-contained.
    ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap');
-
 /* ── Design tokens (mirror the app's variables) ─────────── */
 .cs-root {
     --bg: #080f1a;

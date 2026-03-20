@@ -13,6 +13,7 @@ const faultySessionRoutes = require("./modules/emsp-faulty-sessions/faultySessio
 const fleetRoutes = require("./modules/fleet-management/fleet.routes");
 const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.routes");
 const simulatorRoutes = require("./modules/Charger Simulator/simulator.routes");
+const ocpiAnalyticsRoutes = require("./modules/ocpiAnalytics/ocpiAnalytics.routes");
 
 const app = express();
 
@@ -47,5 +48,6 @@ app.use("/api/emsp-faulty-sessions", faultySessionRoutes);
 app.use("/api/fleet", fleetRoutes);
 app.use("/api/faulty-analysis", faultyAnalysisRoutes);
 app.use("/api/simulator", simulatorRoutes);
+app.use("/api/ocpi-analytics", ocpiAnalyticsRoutes);
 
 module.exports = app;

@@ -153,8 +153,8 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Other Modules */}
-        <NavLink to="/reports" onClick={onClose}>Reports</NavLink>
-        <NavLink to="/analysis" onClick={onClose}>Analysis</NavLink>
+        <NavLink to="/reports" onClick={onClose}>User Review Reports</NavLink>
+        <NavLink to="/analysis" onClick={onClose}>OCPI Analysis</NavLink>
         <NavLink to="/settings" onClick={onClose}>Settings</NavLink>
 
       </nav>
