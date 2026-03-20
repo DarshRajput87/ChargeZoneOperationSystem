@@ -4,7 +4,12 @@ const Model = require("./customerFeedback.model"); // adjust path if needed
 
 exports.saveFeedback = async (mobile, type) => {
     const user = await Model.findOneAndUpdate(
-        { mobile },
+        {
+            $or: [
+                { mobile: mobile },
+                { mobile: Number(mobile) }
+            ]
+        },
         {
             HelpNeeded: type,
             helpResponseAt: new Date(),
@@ -14,3 +19,4 @@ exports.saveFeedback = async (mobile, type) => {
 
     return { status: true, user };
 };
+
