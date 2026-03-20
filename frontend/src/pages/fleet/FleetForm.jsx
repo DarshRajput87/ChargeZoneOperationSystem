@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { getTenants, getOcpiClients, createFleet } from "../../services/fleetService";
+import { getTenants, getOcpiClients, getExistingFleets, createFleet } from "../../services/fleetService";
 import * as XLSX from "xlsx";
 import "./FleetForm.css";
 
@@ -336,22 +336,34 @@ export default function FleetForm() {
     const [excelFile, setExcelFile] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [payloadPreview, setPayloadPreview] = useState(null);
+    const [skipSummary, setSkipSummary] = useState(null); // { existing: [], duplicates: [] }
     const [toast, setToast] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        async function load() {
+        async function loadTenants() {
             try {
                 const tenantRes = await getTenants();
-                const clientRes = await getOcpiClients();
                 setTenants(tenantRes.data || []);
-                setClients(clientRes.data || []);
             } catch {
-                showToast("error", "Failed to load data");
+                showToast("error", "Failed to load tenants");
             }
         }
-        load();
+        loadTenants();
     }, []);
+
+    useEffect(() => {
+        async function loadOcpiClients() {
+            try {
+                setClients([]);
+                const clientRes = await getOcpiClients(tenant?._id);
+                setClients(clientRes.data || []);
+            } catch {
+                showToast("error", "Failed to load OCPI clients");
+            }
+        }
+        loadOcpiClients();
+    }, [tenant]);
 
     const isHMIL = tenant?.ocpp_party_id === "HYD";
 
@@ -394,20 +406,74 @@ export default function FleetForm() {
         if (!tenant) return showToast("error", "Select tenant first");
         if (!excelFile) return showToast("error", "No file selected");
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             const wb = XLSX.read(e.target.result, { type: "array" });
-            const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            const rawRows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
 
-            // ── FIX 1: show which initiator names have invalid OCPI credentials
-            const invalid = rows.filter((r) => !clients.find((c) => c._id === r.ocpiCredential));
+            // Validate OCPI credentials
+            const invalid = rawRows.filter((r) => !clients.find((c) => c._id === r.ocpiCredential));
             if (invalid.length) {
                 const names = invalid
-                    .map((r, idx) => r.initiator_name?.trim() || `Row ${rows.indexOf(r) + 1}`)
+                    .map((r) => r.initiator_name?.trim() || `Row ${rawRows.indexOf(r) + 1}`)
                     .join(", ");
                 return showToast("error", `Invalid OCPI Credential for: ${names}`);
             }
 
-            setPayloadPreview(buildPayload(rows));
+            // ── Step 1: Deduplicate within the Excel file (case-insensitive by initiator_name)
+            const seenNames = new Set();
+            const uniqueRows = [];
+            const intraFileDuplicates = [];
+            for (const r of rawRows) {
+                const key = (r.initiator_name || "").trim().toLowerCase();
+                if (seenNames.has(key)) {
+                    intraFileDuplicates.push(r.initiator_name);
+                } else {
+                    seenNames.add(key);
+                    uniqueRows.push(r);
+                }
+            }
+
+            // ── Step 2: Fetch existing fleet names from ChargeCloud and skip them
+            let existingNames = [];
+            try {
+                const res = await getExistingFleets(tenant._id);
+                existingNames = res.data?.names || [];
+            } catch {
+                showToast("error", "Could not fetch existing fleets — proceeding with full list");
+            }
+            const existingSet = new Set(existingNames.map((n) => n.toLowerCase()));
+            const newRows = [];
+            const alreadyExisting = [];
+            for (const r of uniqueRows) {
+                const key = (r.initiator_name || "").trim().toLowerCase();
+                if (existingSet.has(key)) {
+                    alreadyExisting.push(r.initiator_name);
+                } else {
+                    newRows.push(r);
+                }
+            }
+
+            // Save skip info for display in modal
+            setSkipSummary({
+                existing: alreadyExisting,
+                duplicates: intraFileDuplicates,
+            });
+
+            if (newRows.length === 0) {
+                const reason = alreadyExisting.length
+                    ? `All ${rawRows.length} record(s) already exist in ChargeCloud — nothing to upload.`
+                    : `No new records found after deduplication.`;
+                return showToast("error", reason);
+            }
+
+            if (alreadyExisting.length || intraFileDuplicates.length) {
+                const parts = [];
+                if (alreadyExisting.length) parts.push(`${alreadyExisting.length} already exist`);
+                if (intraFileDuplicates.length) parts.push(`${intraFileDuplicates.length} duplicate(s) in file`);
+                showToast("error", `Skipped: ${parts.join(", ")}. Previewing ${newRows.length} new record(s).`);
+            }
+
+            setPayloadPreview(buildPayload(newRows));
             setShowModal(true);
         };
         reader.readAsArrayBuffer(excelFile);
@@ -424,12 +490,18 @@ export default function FleetForm() {
     const confirmSubmit = async (finalPayload) => {
         setSubmitting(true);
         try {
-            await createFleet(finalPayload);
+            const res = await createFleet(finalPayload);
+            const result = res.data;
             setShowModal(false);
-            showToast("success", `${finalPayload.fleets.length} fleet(s) created successfully`);
+            const parts = [`${result.created ?? finalPayload.fleets.length} fleet(s) created`];
+            if (result.skipped_existing > 0) parts.push(`${result.skipped_existing} already existed (skipped)`);
+            if (result.skipped_duplicates > 0) parts.push(`${result.skipped_duplicates} duplicate(s) skipped`);
+            showToast("success", parts.join(" · "));
             setFleets([{ initiator_name: "", price_per_unit: "", ocpiCredential: "" }]);
-        } catch {
-            showToast("error", "Fleet creation failed — check your connection");
+            setSkipSummary(null);
+        } catch (err) {
+            const msg = err?.response?.data?.error || err?.message || "Fleet creation failed — check your connection";
+            showToast("error", msg);
         } finally {
             setSubmitting(false);
         }
