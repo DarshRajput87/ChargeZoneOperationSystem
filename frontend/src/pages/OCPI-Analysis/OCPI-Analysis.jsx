@@ -101,12 +101,12 @@ const OCPIAnalysis = () => {
     }, [filters]);
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/ocpi-analytics/all-parties")
+        fetch("https://api.chargezoneops.online/api/ocpi-analytics/all-parties")
             .then(res => res.json())
             .then(data => setParties(data.data || []))
             .catch(console.error);
 
-        fetch("http://localhost:5000/api/ocpi-analytics/tenants")
+        fetch("https://api.chargezoneops.online/api/ocpi-analytics/tenants")
             .then(res => res.json())
             .then(data => setTenants(data.data || []))
             .catch(console.error);
