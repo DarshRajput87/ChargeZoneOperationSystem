@@ -3,16 +3,14 @@
 const Model = require("./customerFeedback.model"); // adjust path if needed
 
 exports.saveFeedback = async (mobile, type) => {
-    const user = await Model.findOne({ mobile });
-
-    if (!user) {
-        return { status: false, message: "User not found" };
-    }
-
-    user.HelpNeeded = type;
-    user.helpResponseAt = new Date();
-
-    await user.save();
+    const user = await Model.findOneAndUpdate(
+        { mobile },
+        {
+            HelpNeeded: type,
+            helpResponseAt: new Date(),
+        },
+        { new: true, upsert: true }
+    );
 
     return { status: true, user };
 };
