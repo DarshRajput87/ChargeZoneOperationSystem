@@ -75,7 +75,7 @@ const OCPIAnalysis = () => {
             if (filters.status) query += `&status=${filters.status}`;
             if (filters.booking_type) query += `&booking_type=${filters.booking_type}`;
 
-            const base = "http://localhost:5000/api/ocpi-analytics";
+            const base = "https://api.chargezoneops.online/api/ocpi-analytics";
 
             const [logsRes, summaryRes, modulesRes] = await Promise.all([
                 fetch(`${base}/logs${query}`),
