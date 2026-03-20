@@ -14,6 +14,7 @@ const fleetRoutes = require("./modules/fleet-management/fleet.routes");
 const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.routes");
 const simulatorRoutes = require("./modules/Charger Simulator/simulator.routes");
 const ocpiAnalyticsRoutes = require("./modules/ocpiAnalytics/ocpiAnalytics.routes");
+const feedbackRoutes = require("./modules/feedback/feedback.routes");
 
 const app = express();
 
@@ -49,5 +50,6 @@ app.use("/api/fleet", fleetRoutes);
 app.use("/api/faulty-analysis", faultyAnalysisRoutes);
 app.use("/api/simulator", simulatorRoutes);
 app.use("/api/ocpi-analytics", ocpiAnalyticsRoutes);
+app.use("/feedback", feedbackRoutes);
 
 module.exports = app;
