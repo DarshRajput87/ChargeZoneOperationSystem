@@ -207,7 +207,7 @@ export default function CDRPushDashboard() {
   };
 
   return (
-    <div className="cdr-container">
+    <div className="cdr-push-page">
       <div className="cdr-card">
 
         <h1 className="cdr-header">
