@@ -1,5 +1,7 @@
-/* ── Variables ──────────────────────────────────────────────── */
-:root {
+/* ── Variables (scoped to .ipsl-page) ──────────────────────── */
+
+/* ── Page ───────────────────────────────────────────────────── */
+.ipsl-page {
   --bg-base: #07111c;
   --bg-card: rgba(255, 255, 255, 0.028);
   --bg-card-hover: rgba(255, 255, 255, 0.048);
@@ -16,23 +18,10 @@
   --text-primary: #eef3f8;
   --text-secondary: #7e97af;
   --text-muted: #3f5468;
-  --font: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
   --radius-lg: 14px;
   --shadow-sm: 0 2px 16px rgba(0, 0, 0, 0.28);
   --shadow-lg: 0 28px 90px rgba(0, 0, 0, 0.72);
-}
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* ── Page ───────────────────────────────────────────────────── */
-.ipsl-page {
   background: var(--bg-base);
   min-height: 100vh;
   padding: 32px 44px 60px;

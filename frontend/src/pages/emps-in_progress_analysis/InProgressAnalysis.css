@@ -1,4 +1,7 @@
-:root {
+/* ── Variables (scoped to .analysis-page) ── */
+
+/* ── Page ── */
+.analysis-page {
     --bg: #0d1117;
     --surface: #161b22;
     --card: #1c2230;
@@ -11,30 +14,15 @@
     --text-sub: #8b949e;
     --text-dim: #484f58;
     --radius: 10px;
-}
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 13px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* ── Page ── */
-.analysis-page {
     padding: 24px 28px 48px;
     min-height: 100vh;
     background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ── Header ── */
@@ -795,16 +783,16 @@ body {
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar {
+.analysis-page ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
 }
 
-::-webkit-scrollbar-track {
+.analysis-page ::-webkit-scrollbar-track {
     background: var(--bg);
 }
 
-::-webkit-scrollbar-thumb {
+.analysis-page ::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 3px;
 }

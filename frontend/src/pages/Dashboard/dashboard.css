@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-
 /* ─────────────────────────────────────
    PAGE SHELL
    position:relative scopes EVLoader
 ───────────────────────────────────── */
 .dashboard-page {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font);
   position: relative;
   min-height: 400px;
 }

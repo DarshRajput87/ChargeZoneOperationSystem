@@ -1,30 +1,21 @@
 /* ============================================
    ChargeZone Login Page - CSS
+   All styles scoped under .login-page
    ============================================ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #0f1923;
-}
-
 /* Full-page centered background */
-.login-container {
+.login-page {
   min-height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #0f1923;
+  font-family: var(--font);
 }
 
-/* The white-ish card */
-.login-box {
+/* The card */
+.login-page .login-box {
   background-color: #1a2636;
   border-radius: 16px;
   padding: 40px 48px 48px;
@@ -37,7 +28,7 @@ body {
 }
 
 /* Logo */
-.logo {
+.login-page .logo {
   width: 200px;
   height: auto;
   margin-bottom: 28px;
@@ -45,8 +36,8 @@ body {
 }
 
 /* "Login" heading */
-.login-box h2,
-.login-box h3 {
+.login-page .login-box h2,
+.login-page .login-box h3 {
   color: #ffffff;
   font-size: 24px;
   font-weight: 700;
@@ -55,10 +46,10 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* Subtitle "Welcome to ChargeZone" */
-.login-box p.subtitle,
-.login-box h3+p,
-.login-subtitle {
+/* Subtitle */
+.login-page .login-box p.subtitle,
+.login-page .login-box h3+p,
+.login-page .login-subtitle {
   color: #a0aab4;
   font-size: 14px;
   margin-bottom: 32px;
@@ -66,7 +57,7 @@ body {
 }
 
 /* Error message */
-.error {
+.login-page .error {
   color: #e53935;
   font-size: 13px;
   background-color: rgba(229, 57, 53, 0.1);
@@ -79,7 +70,7 @@ body {
 }
 
 /* Form layout */
-form {
+.login-page form {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -87,8 +78,8 @@ form {
 }
 
 /* Labels */
-.form-label,
-form label {
+.login-page .form-label,
+.login-page form label {
   display: block;
   color: #c5cdd6;
   font-size: 13px;
@@ -98,47 +89,48 @@ form label {
 }
 
 /* Input fields */
-form input[type="email"],
-form input[type="password"],
-form input[type="text"],
-.login-input {
+.login-page form input[type="email"],
+.login-page form input[type="password"],
+.login-page form input[type="text"],
+.login-page .login-input {
   width: 100%;
   background-color: #1e2e40;
   border: 1px solid #2a3d52;
   border-radius: 8px;
   color: #e8edf2;
   font-size: 14px;
+  font-family: var(--font);
   padding: 13px 16px;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   caret-color: #e53935;
 }
 
-form input[type="email"]:focus,
-form input[type="password"]:focus,
-form input[type="text"]:focus,
-.login-input:focus {
+.login-page form input[type="email"]:focus,
+.login-page form input[type="password"]:focus,
+.login-page form input[type="text"]:focus,
+.login-page .login-input:focus {
   border-color: #3a5068;
   box-shadow: 0 0 0 3px rgba(58, 80, 104, 0.25);
 }
 
-form input::placeholder,
-.login-input::placeholder {
+.login-page form input::placeholder,
+.login-page .login-input::placeholder {
   color: #4a5d6e;
 }
 
-/* Password wrapper (for show/hide eye icon) */
-.password-wrapper {
+/* Password wrapper */
+.login-page .password-wrapper {
   position: relative;
   width: 100%;
 }
 
-.password-wrapper input {
+.login-page .password-wrapper input {
   width: 100%;
   padding-right: 44px;
 }
 
-.password-toggle {
+.login-page .password-toggle {
   position: absolute;
   right: 14px;
   top: 50%;
@@ -154,12 +146,12 @@ form input::placeholder,
   transition: color 0.2s;
 }
 
-.password-toggle:hover {
+.login-page .password-toggle:hover {
   color: #8a9bb0;
 }
 
 /* Forgot password link */
-.forgot-password {
+.login-page .forgot-password {
   display: block;
   text-align: right;
   color: #3b82f6;
@@ -171,14 +163,14 @@ form input::placeholder,
   transition: color 0.2s;
 }
 
-.forgot-password:hover {
+.login-page .forgot-password:hover {
   color: #60a5fa;
   text-decoration: underline;
 }
 
 /* Login button */
-form button[type="submit"],
-.login-btn {
+.login-page form button[type="submit"],
+.login-page .login-btn {
   width: 100%;
   background-color: #e53935;
   color: #ffffff;
@@ -186,6 +178,7 @@ form button[type="submit"],
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
+  font-family: var(--font);
   padding: 16px;
   cursor: pointer;
   margin-top: 12px;
@@ -193,20 +186,20 @@ form button[type="submit"],
   transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
-form button[type="submit"]:hover,
-.login-btn:hover {
+.login-page form button[type="submit"]:hover,
+.login-page .login-btn:hover {
   background-color: #c62828;
   box-shadow: 0 4px 16px rgba(229, 57, 53, 0.35);
 }
 
-form button[type="submit"]:active,
-.login-btn:active {
+.login-page form button[type="submit"]:active,
+.login-page .login-btn:active {
   transform: scale(0.99);
   background-color: #b71c1c;
 }
 
-form button[type="submit"]:disabled,
-.login-btn:disabled {
+.login-page form button[type="submit"]:disabled,
+.login-page .login-btn:disabled {
   background-color: #7a2320;
   cursor: not-allowed;
   opacity: 0.6;
@@ -214,62 +207,62 @@ form button[type="submit"]:disabled,
 
 /* Responsive */
 @media (max-width: 620px) {
-  .login-box {
+  .login-page .login-box {
     margin: 16px;
     padding: 48px 32px 56px;
     border-radius: 14px;
   }
 
-  .logo {
+  .login-page .logo {
     width: 190px;
   }
 }
 
 /* Small phones (< 480px) */
 @media (max-width: 479px) {
-  .login-box {
+  .login-page .login-box {
     margin: 12px;
     padding: 36px 24px 44px;
     border-radius: 12px;
   }
 
-  .logo {
+  .login-page .logo {
     width: 160px;
     margin-bottom: 24px;
   }
 
-  .login-box h2,
-  .login-box h3 {
+  .login-page .login-box h2,
+  .login-page .login-box h3 {
     font-size: 20px;
     margin-bottom: 20px;
   }
 
-  .login-box p.subtitle,
-  .login-box h3+p,
-  .login-subtitle {
+  .login-page .login-box p.subtitle,
+  .login-page .login-box h3+p,
+  .login-page .login-subtitle {
     font-size: 13px;
     margin-bottom: 28px;
   }
 
-  form input[type="email"],
-  form input[type="password"],
-  form input[type="text"],
-  .login-input {
+  .login-page form input[type="email"],
+  .login-page form input[type="password"],
+  .login-page form input[type="text"],
+  .login-page .login-input {
     padding: 12px 14px;
     font-size: 13px;
   }
 
-  form button[type="submit"],
-  .login-btn {
+  .login-page form button[type="submit"],
+  .login-page .login-btn {
     padding: 14px;
     font-size: 14px;
   }
 
-  .forgot-password {
+  .login-page .forgot-password {
     font-size: 12px;
   }
 
-  .password-toggle {
+  .login-page .password-toggle {
     right: 12px;
     font-size: 14px;
   }

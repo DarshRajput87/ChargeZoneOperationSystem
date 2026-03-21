@@ -1,46 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 /* ====================================================
-   TOKENS
+   TOKENS (scoped to .cdr-page)
    ==================================================== */
-:root {
-  --red: #e5342a;
-  --red-hover: #f04438;
-  --red-glow: rgba(229, 52, 42, 0.22);
-  --green: #3dd68c;
-
-  --bg: #070f1c;
-  --surface: #0d1828;
-  --surface-2: #111e30;
-
-  --border: rgba(255, 255, 255, 0.07);
-  --border-md: rgba(255, 255, 255, 0.12);
-
-  --t1: #e4eaf6;
-  --t2: rgba(228, 234, 246, 0.55);
-  --t3: rgba(228, 234, 246, 0.28);
-  --t4: rgba(228, 234, 246, 0.13);
-
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 14px;
-  --r-xl: 16px;
-
-  --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --mono: 'DM Mono', 'SF Mono', 'Courier New', monospace;
-  --ease: 160ms ease;
-}
 
 /* ====================================================
    PAGE
    ==================================================== */
 .cdr-page {
+  --red: #e5342a;
+  --red-hover: #f04438;
+  --red-glow: rgba(229, 52, 42, 0.22);
+  --green: #3dd68c;
+  --bg: #070f1c;
+  --surface: #0d1828;
+  --surface-2: #111e30;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-md: rgba(255, 255, 255, 0.12);
+  --t1: #e4eaf6;
+  --t2: rgba(228, 234, 246, 0.55);
+  --t3: rgba(228, 234, 246, 0.28);
+  --t4: rgba(228, 234, 246, 0.13);
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 16px;
+  --sans: var(--font);
+  --mono-cdr: var(--mono);
+  --ease: 160ms ease;
+
   width: 100%;
   min-height: 100vh;
   padding: 36px 32px 80px;

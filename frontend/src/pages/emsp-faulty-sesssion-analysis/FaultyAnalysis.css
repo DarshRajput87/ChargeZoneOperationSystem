@@ -1,35 +1,29 @@
-/* =====================================================
+/* ==============================================
    FAULT ANALYTICS — PREMIUM DARK DASHBOARD
-   ===================================================== */
+   All variables scoped to .fault-dashboard
+   ============================================== */
 
-:root {
+/* ── BASE ── */
+
+.fault-dashboard {
     --bg-deep: #060d14;
     --bg-card: #0c1622;
     --border: rgba(255, 255, 255, 0.06);
     --border-glow: rgba(59, 130, 246, 0.35);
-
     --blue: #3b82f6;
     --blue-dim: #60a5fa;
     --orange: #f97316;
     --red: #ef4444;
     --green: #22c55e;
     --purple: #a855f7;
-
     --text-hi: #f0f6ff;
     --text-mid: #7a93b0;
     --text-lo: #3d5570;
-
-    --font: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-    --font-num: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-
+    --font-num: var(--font);
     --r-sm: 8px;
     --r-md: 14px;
     --r-lg: 20px;
-}
 
-/* ── BASE ── */
-
-.fault-dashboard {
     padding: 36px 40px 52px;
     background: var(--bg-deep);
     min-height: 100vh;
@@ -71,7 +65,7 @@
 
 /* ── HEADER ── */
 
-.dashboard-header {
+.fault-dashboard .dashboard-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -79,7 +73,7 @@
     gap: 16px;
 }
 
-.page-title {
+.fault-dashboard .page-title {
     font-size: 26px;
     font-weight: 800;
     letter-spacing: -.3px;
@@ -90,7 +84,7 @@
     font-family: var(--font);
 }
 
-.page-title::before {
+.fault-dashboard .page-title::before {
     content: '';
     display: inline-block;
     width: 4px;
@@ -100,7 +94,7 @@
     flex-shrink: 0;
 }
 
-.page-subtitle {
+.fault-dashboard .page-subtitle {
     font-size: 12px;
     color: var(--text-mid);
     font-family: var(--font);
