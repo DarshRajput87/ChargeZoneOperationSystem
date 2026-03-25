@@ -1,33 +1,48 @@
-stages:
-  - deploy
+script:
+  - export RELEASE=$(date +%s)
 
-deploy_backend:
-  stage: deploy
-  only:
-    - main
+  # create release directory
+  - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
 
-  before_script:
-    - apt-get update -y
-    - apt-get install -y openssh-client rsync
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+  # sync files (optimized)
+  - rsync -az --delete \
+      --exclude='.git' \
+      --exclude='node_modules' \
+      --exclude='.env' \
+      --exclude='logs' \
+      ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
 
-  script:
-    - export RELEASE=$(date +%s)
+  # install + start
+  - ssh $EC2_USER@$EC2_HOST "
+      set -e
 
-    # create release directory
-    - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
+      cd $PROJECT_PATH/releases/$RELEASE/backend &&
 
-    # sync files to EC2
-    - rsync -az --delete --exclude='.git' --exclude='gitlab-deploy' --exclude='gitlab-deploy.pub' ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+      npm ci --omit=dev &&
 
-    # install backend dependencies and restart server
-    - ssh $EC2_USER@$EC2_HOST "
-        cd $PROJECT_PATH/releases/$RELEASE/backend &&
-        npm ci --omit=dev &&
-        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
-        pm2 reload server || pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
-      "
+      ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
+
+      pm2 reload server || pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
+    "
+
+  # 🔥 CLEANUP OLD RELEASES (MOST IMPORTANT)
+  - ssh $EC2_USER@$EC2_HOST "
+      cd $PROJECT_PATH/releases &&
+
+      echo 'Cleaning old releases...' &&
+
+      ls -dt */ | tail -n +4 | xargs -r rm -rf
+    "
+
+  # 🔍 DISK SAFETY CHECK (AUTO-PROTECTION)
+  - ssh $EC2_USER@$EC2_HOST "
+      USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//') &&
+
+      echo \"Disk usage: \$USAGE%\" &&
+
+      if [ \"\$USAGE\" -gt 85 ]; then
+        echo 'High disk usage, aggressive cleanup...' &&
+        cd $PROJECT_PATH/releases &&
+        ls -dt */ | tail -n +3 | xargs -r rm -rf
+      fi
+    "
