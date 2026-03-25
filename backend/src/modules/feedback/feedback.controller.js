@@ -20,484 +20,461 @@ exports.handleFeedback = async (req, res) => {
             return res.status(404).send("<h2>User not found</h2>");
         }
 
-        console.log(`✅ Feedback: ${mobile} → ${type}`);
+        const getResponseHtml = ({ title, subtitle, accentWord, variant }) => {
+            const isPositive = variant === "positive"; // "yes" → Thank You
+            // ── ChargeZone brand palette ──────────────────────────────────────
+            const ring = isPositive ? "#00c9a7" : "#ffaa00"; // teal : amber
+            const ring2 = isPositive ? "#0af5c8" : "#ff7700";
 
-        const getResponseHtml = (variant) => {
-            const isYes = variant === "yes";
+            // Particle configs (28 pieces)
+            const particleCount = 28;
+            const particles = Array.from({ length: particleCount }, (_, i) => {
+                const angle = (i / particleCount) * 360;
+                const delay = +(i * 0.07).toFixed(2);
+                const size = 2 + (i % 3) * 1.5;
+                const dist = 85 + (i % 5) * 22;
+                const dur = 1.6 + (i % 4) * 0.3;
+                const colorSet = isPositive
+                    ? ["#00c9a7", "#0af5c8", "#00d4ff", "#92ffe0"]
+                    : ["#ffaa00", "#ff7700", "#e8303a", "#ffdd55"];
+                const color = colorSet[i % colorSet.length];
+                return { angle, delay, size, dist, dur, color };
+            });
 
-            const config = {
-                yes: {
-                    title: "Thank You!",
-                    icon: "🙏",
-                    subtitle: "Our team will contact you within",
-                    accentText: "24 hours",
-                    accentEnd: ".",
-                    badge: "Support team notified",
-                    accentColor: "#00c2ff",
-                    accentColorRgb: "0,194,255",
-                    orbColor1: "rgba(0,194,255,0.14)",
-                    orbColor2: "rgba(232,48,58,0.10)",
-                    gridColor: "rgba(0,194,255,0.03)",
-                    cardBorder: "rgba(0,194,255,0.12)",
-                    cardShimmer: "rgba(0,194,255,0.05)",
-                    topLine: "rgba(0,194,255,0.5)",
-                    divider: "linear-gradient(90deg, #00c2ff, #e8303a)",
-                    titleGradient: "linear-gradient(135deg, #fff 0%, #e2ecf7 40%, #00c2ff 100%)",
-                    extraBlock: `
-                        <div class="badge">
-                            <div class="badge-dot"></div>
-                            Support team notified
-                        </div>`,
-                    extraCSS: `
-                        .badge {
-                            display: inline-flex; align-items: center; gap: 8px;
-                            background: rgba(0,194,255,0.08);
-                            border: 1px solid rgba(0,194,255,0.2);
-                            border-radius: 100px;
-                            padding: 0.45rem 1.1rem;
-                            font-size: 0.82rem; letter-spacing: 0.04em;
-                            color: rgba(226,236,247,0.65);
-                            margin-top: 1.6rem;
-                            opacity: 0;
-                            animation: fadeIn 0.5s ease 1.8s forwards;
-                        }
-                        .badge-dot {
-                            width: 7px; height: 7px; border-radius: 50%;
-                            background: #00c2ff;
-                            animation: dotBlink 1.5s ease-in-out infinite;
-                            box-shadow: 0 0 7px #00c2ff;
-                        }
-                        @keyframes dotBlink { 0%,100% { opacity:1; } 50% { opacity:0.25; } }
-                        /* Radar sweep */
-                        .radar {
-                            position: fixed; width: 750px; height: 750px;
-                            border-radius: 50%;
-                            border: 1px solid rgba(0,194,255,0.05);
-                            top: 50%; left: 50%;
-                            transform: translate(-50%,-50%);
-                            z-index: 0; pointer-events: none;
-                        }
-                        .radar::before, .radar::after {
-                            content:''; position:absolute; border-radius:50%;
-                            border: 1px solid rgba(0,194,255,0.04);
-                        }
-                        .radar::before { inset:110px; }
-                        .radar::after { inset:230px; }
-                        .radar-sweep {
-                            position:absolute; inset:0; border-radius:50%; overflow:hidden;
-                        }
-                        .radar-sweep::after {
-                            content:''; position:absolute; top:50%; left:50%;
-                            width:50%; height:50%;
-                            transform-origin: 0% 100%;
-                            background: conic-gradient(from 0deg, rgba(0,194,255,0.13), transparent 60deg);
-                            animation: radarSpin 4s linear 1.2s infinite;
-                        }
-                        @keyframes radarSpin { to { transform: rotate(360deg); } }
-                        /* Timer arc */
-                        .timer-ring { position:absolute; inset:-4px; }
-                        .timer-ring svg { width:100%; height:100%; transform:rotate(-90deg); }
-                        .timer-ring circle {
-                            fill:none; stroke:rgba(0,194,255,0.35); stroke-width:1.5;
-                            stroke-linecap:round;
-                            stroke-dasharray:330; stroke-dashoffset:330;
-                            animation: timerFill 2s ease 1.5s forwards;
-                        }
-                        @keyframes timerFill { to { stroke-dashoffset:0; } }
-                    `,
-                    extraHTML: `<div class="radar"><div class="radar-sweep"></div></div>`,
-                    iconInner: `
-                        <div class="icon-bg"></div>
-                        <div class="pulse-ring"></div>
-                        <div class="pulse-ring p2"></div>
-                        <div class="timer-ring">
-                            <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52"/></svg>
-                        </div>
-                        <div class="emoji">🙏</div>`,
-                    iconCSS: `
-                        .icon-bg {
-                            position:absolute; inset:0; border-radius:50%;
-                            background: radial-gradient(circle at 40% 40%, rgba(0,194,255,0.12), transparent 70%);
-                            border: 1px solid rgba(0,194,255,0.15);
-                        }
-                        .pulse-ring {
-                            position:absolute; inset:-8px; border-radius:50%;
-                            border:1.5px solid rgba(0,194,255,0.22);
-                            animation: pulseRing 2.5s ease-in-out 1.7s infinite;
-                        }
-                        .pulse-ring.p2 {
-                            inset:-20px;
-                            border:1px solid rgba(0,194,255,0.1);
-                            animation-delay: 2s;
-                        }
-                        @keyframes pulseRing { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.1);opacity:0.3;} }
-                        .emoji {
-                            position:absolute; inset:0;
-                            display:flex; align-items:center; justify-content:center;
-                            font-size:3.2rem;
-                            animation: emojiFloat 3.5s ease-in-out 1.5s infinite;
-                            filter: drop-shadow(0 4px 20px rgba(0,194,255,0.35));
-                        }
-                        @keyframes emojiFloat { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-8px) scale(1.06);} }
-                    `,
-                    particleColors: `['#00c2ff','#e8303a','#e2ecf7']`,
-                    confettiColors: `['#00c2ff','#e8303a','#f5a623','#e2ecf7','#5e7a94']`,
-                    confettiFunc: `launchRipples`,
-                    extraJS: `
-                        function launchRipples() {
-                            const cx = window.innerWidth/2, cy = window.innerHeight/2;
-                            for (let i=0;i<4;i++) {
-                                setTimeout(()=>{
-                                    const el = document.createElement('div');
-                                    el.style.cssText = \`
-                                        position:fixed; left:\${cx}px; top:\${cy}px;
-                                        width:0; height:0;
-                                        border:1px solid rgba(0,194,255,0.4);
-                                        border-radius:50%;
-                                        transform:translate(-50%,-50%);
-                                        pointer-events:none; z-index:5;
-                                    \`;
-                                    document.body.appendChild(el);
-                                    el.animate([
-                                        {width:'0px',height:'0px',opacity:0.8},
-                                        {width:'600px',height:'600px',opacity:0}
-                                    ],{duration:1800,easing:'ease-out',fill:'forwards'})
-                                    .onfinish = ()=>el.remove();
-                                }, i*300+800);
-                            }
-                        }
-                        launchRipples();
-                    `
-                },
-                no: {
-                    title: "Awesome!",
-                    icon: "⚡",
-                    subtitle: "We're glad you had a",
-                    accentText: "great experience",
-                    accentEnd: " today.",
-                    accentColor: "#00d97e",
-                    accentColorRgb: "0,217,126",
-                    orbColor1: "rgba(232,48,58,0.18)",
-                    orbColor2: "rgba(0,217,126,0.12)",
-                    gridColor: "rgba(232,48,58,0.04)",
-                    cardBorder: "rgba(232,48,58,0.15)",
-                    cardShimmer: "rgba(232,48,58,0.06)",
-                    topLine: "rgba(232,48,58,0.6)",
-                    divider: "linear-gradient(90deg, #e8303a, #f5a623)",
-                    titleGradient: "linear-gradient(135deg, #fff 0%, #e2ecf7 40%, #e8303a 100%)",
-                    extraBlock: ``,
-                    extraCSS: ``,
-                    extraHTML: ``,
-                    iconInner: `
-                        <div class="icon-bg"></div>
-                        <div class="ring r1"></div>
-                        <div class="ring r2"></div>
-                        <div class="emoji">⚡</div>`,
-                    iconCSS: `
-                        .icon-bg {
-                            position:absolute; inset:0; border-radius:50%;
-                            background: radial-gradient(circle at 40% 40%, rgba(232,48,58,0.15), transparent 70%);
-                            border: 1px solid rgba(232,48,58,0.2);
-                        }
-                        .ring {
-                            position:absolute; border-radius:50%;
-                            border:2px solid rgba(232,48,58,0.25);
-                        }
-                        .r1 { inset:0; animation: ringPulse 2s ease-in-out 1.7s infinite; }
-                        .r2 { inset:-14px; border-color:rgba(232,48,58,0.13); animation: ringPulse 2s ease-in-out 2s infinite; }
-                        @keyframes ringPulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.15);opacity:0.35;} }
-                        .emoji {
-                            position:absolute; inset:0;
-                            display:flex; align-items:center; justify-content:center;
-                            font-size:3rem;
-                            animation: boltFloat 3s ease-in-out 1.5s infinite, boltGlow 3s ease-in-out 1.5s infinite;
-                        }
-                        @keyframes boltFloat { 0%,100%{transform:translateY(0) rotate(-5deg);} 50%{transform:translateY(-7px) rotate(5deg);} }
-                        @keyframes boltGlow {
-                            0%,100%{ filter: drop-shadow(0 0 8px rgba(245,166,35,0.5)); }
-                            50%{ filter: drop-shadow(0 0 22px rgba(245,166,35,0.95)) drop-shadow(0 0 40px rgba(232,48,58,0.45)); }
-                        }
-                    `,
-                    particleColors: `['#e8303a','#00d97e','#f5a623']`,
-                    confettiColors: `['#e8303a','#f5a623','#00d97e','#e2ecf7','#5e7a94']`,
-                    confettiFunc: `launchConfetti`,
-                    extraJS: `
-                        function launchConfetti() {
-                            const colors = ['#e8303a','#f5a623','#00d97e','#e2ecf7','#5e7a94'];
-                            const cx = window.innerWidth/2, cy = window.innerHeight/2;
-                            for (let i=0;i<70;i++) {
-                                setTimeout(()=>{
-                                    const el = document.createElement('div');
-                                    const size = Math.random()*8+4;
-                                    el.style.cssText = \`
-                                        position:fixed; left:\${cx}px; top:\${cy}px;
-                                        width:\${size}px; height:\${size}px;
-                                        background:\${colors[Math.floor(Math.random()*colors.length)]};
-                                        border-radius:\${Math.random()>0.5?'50%':'3px'};
-                                        pointer-events:none; z-index:20;
-                                    \`;
-                                    document.body.appendChild(el);
-                                    const angle = Math.random()*Math.PI*2;
-                                    const speed = Math.random()*320+80;
-                                    const tx = Math.cos(angle)*speed;
-                                    const ty = Math.sin(angle)*speed - 160;
-                                    el.animate([
-                                        {transform:\`translate(0,0) rotate(0deg) scale(1)\`,opacity:1},
-                                        {transform:\`translate(\${tx}px,\${ty}px) rotate(\${Math.random()*720}deg) scale(0)\`,opacity:0}
-                                    ],{duration:Math.random()*900+500,easing:'cubic-bezier(0,0,0.2,1)',fill:'forwards'})
-                                    .onfinish = ()=>el.remove();
-                                }, i*18+900);
-                            }
-                        }
-                        launchConfetti();
-                    `
-                }
-            };
+            const particleCSS = particles.map((p, i) => `
+.p${i}{width:${p.size}px;height:${p.size}px;background:${p.color};
+  box-shadow:0 0 6px 2px ${p.color}88;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  animation:pb${i} ${p.dur}s ease-out ${p.delay}s forwards,pf ${p.dur}s ease-out ${p.delay}s forwards;}
+@keyframes pb${i}{
+  0%{transform:translate(-50%,-50%) rotate(${p.angle}deg) translateX(0);}
+  100%{transform:translate(-50%,-50%) rotate(${p.angle}deg) translateX(${p.dist}px);}}`
+            ).join("\n");
+            const particleHTML = particles.map((_, i) => `<div class="particle p${i}"></div>`).join("");
 
-            const c = config[variant];
+            // ── Main icon SVGs ────────────────────────────────────────────────
+            const thankYouIcon = `
+<svg class="main-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="starG" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="${ring2}"/>
+      <stop offset="100%" stop-color="${ring}"/>
+    </radialGradient>
+    <filter id="sGlow"><feGaussianBlur stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- 5-pointed star -->
+  <polygon points="50,8 61,36 90,36 68,55 76,82 50,65 24,82 32,55 10,36 39,36"
+           fill="url(#starG)" filter="url(#sGlow)"/>
+  <circle cx="50" cy="44" r="9" fill="white" opacity="0.22"/>
+</svg>`;
+
+            const awesomeIcon = `
+<svg class="main-icon-svg" viewBox="0 0 80 110" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="boltG" x1="0%" y1="0%" x2="60%" y2="100%">
+      <stop offset="0%" stop-color="#ffe040"/>
+      <stop offset="55%" stop-color="#ffaa00"/>
+      <stop offset="100%" stop-color="#ff7700"/>
+    </linearGradient>
+    <filter id="bGlow"><feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <polygon points="48,4 22,58 44,58 32,106 58,52 36,52"
+           fill="url(#boltG)" filter="url(#bGlow)"/>
+  <polygon points="48,4 22,58 44,58 32,106 58,52 36,52"
+           fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+</svg>`;
 
             return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChargeZone</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #080f1a;
-            --surface: #0c1525;
-            --card: #101e30;
-            --accent: #e8303a;
-            --text: #e2ecf7;
-            --muted: #5e7a94;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html, body { width:100%; height:100%; background:var(--bg); font-family:'DM Sans',sans-serif; color:var(--text); overflow:hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChargeZone – ${title}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080f1a; --surface:#0c1525; --card:#101e30;
+  --accent:#e8303a; --text:#e2ecf7; --muted:#5e7a94;
+  --ring:${ring}; --ring2:${ring2};
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
+  font-family:'DM Sans',sans-serif;color:var(--text);}
 
-        /* Canvas */
-        #particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+/* ── Grid mesh background ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-size:52px 52px;
+  animation:gridMove 18s linear infinite;
+}
+@keyframes gridMove{from{background-position:0 0}to{background-position:52px 52px}}
 
-        /* Orbs */
-        .orb { position:fixed; border-radius:50%; filter:blur(85px); opacity:0; animation:orbFade 1.2s ease forwards; pointer-events:none; z-index:0; }
-        .orb-1 { width:520px; height:520px; background:radial-gradient(circle,${c.orbColor1},transparent 70%); top:-160px; right:-110px; animation-delay:0.3s; }
-        .orb-2 { width:420px; height:420px; background:radial-gradient(circle,${c.orbColor2},transparent 70%); bottom:-100px; left:-90px; animation-delay:0.6s; }
-        @keyframes orbFade { to { opacity:1; } }
+/* ── Ambient blobs ── */
+.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:0.15;pointer-events:none;z-index:0;}
+.b1{width:480px;height:480px;background:var(--ring);top:-130px;right:-130px;
+    animation:bf1 9s ease-in-out infinite alternate;}
+.b2{width:380px;height:380px;background:var(--accent);bottom:-100px;left:-100px;
+    animation:bf2 11s ease-in-out infinite alternate;}
+.b3{width:260px;height:260px;background:var(--ring2);top:40%;left:40%;
+    animation:bf1 7s ease-in-out infinite alternate; opacity:0.08;}
+@keyframes bf1{from{transform:scale(1) translate(0,0)}to{transform:scale(1.12) translate(25px,18px)}}
+@keyframes bf2{from{transform:scale(1) translate(0,0)}to{transform:scale(1.1) translate(-18px,28px)}}
 
-        /* Grid */
-        .grid-overlay {
-            position:fixed; inset:0; z-index:0; pointer-events:none;
-            background-image: linear-gradient(${c.gridColor} 1px,transparent 1px), linear-gradient(90deg,${c.gridColor} 1px,transparent 1px);
-            background-size:60px 60px;
-            animation:gridDrift 22s linear infinite;
-        }
-        @keyframes gridDrift { to { background-position:60px 60px; } }
+/* ── Scene ── */
+.scene{
+  position:relative;z-index:1;
+  width:100%;height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+}
 
-        /* Scanline */
-        .scanline {
-            position:fixed; inset:0; z-index:1; pointer-events:none;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-            animation: scanMove 8s linear infinite;
-        }
-        @keyframes scanMove { 0%{background-position:0 0;} 100%{background-position:0 100px;} }
+/* ── Logo ── */
+.logo-wrap{
+  display:flex;align-items:center;gap:12px;
+  opacity:0;transform:translateY(-18px);
+  animation:slideIn 0.65s cubic-bezier(0.16,1,0.3,1) 0.05s forwards;
+  margin-bottom:2.4rem;
+}
+.logo-img{height:40px;width:auto;filter:drop-shadow(0 0 12px var(--accent)66);}
+@keyframes slideIn{to{opacity:1;transform:translateY(0)}}
 
-        ${c.extraCSS}
+/* Fallback text logo */
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;
+  letter-spacing:0.12em;color:var(--text);}
+.logo-text em{color:var(--accent);font-style:normal;}
+.logo-sub{font-size:0.5rem;letter-spacing:0.22em;color:var(--muted);
+  text-transform:uppercase;margin-top:1px;}
 
-        /* Scene */
-        .scene { position:relative; z-index:10; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; }
+/* ── Card ── */
+.card{
+  position:relative;
+  background:linear-gradient(148deg, var(--card) 0%, var(--surface) 100%);
+  border:1px solid rgba(255,255,255,0.065);
+  border-radius:30px;
+  padding:3rem 2.6rem 2.4rem;
+  width:min(90vw,400px);
+  text-align:center;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.035),
+    0 40px 90px -15px rgba(0,0,0,0.75),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  opacity:0;transform:translateY(44px) scale(0.93);
+  animation:cardIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.25s forwards;
+  overflow:hidden;
+}
+@keyframes cardIn{to{opacity:1;transform:translateY(0) scale(1)}}
 
-        /* Logo */
-        .logo-wrap { opacity:0; transform:translateY(-20px); animation:slideDown 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s forwards; margin-bottom:2.5rem; }
-        .logo-wrap img { height:40px; width:auto; filter:drop-shadow(0 0 12px rgba(232,48,58,0.45)); }
-        .logo-fallback { display:none; align-items:center; gap:8px; }
-        .logo-fallback span { font-family:'Syne',sans-serif; font-size:1.25rem; font-weight:800; color:#e2ecf7; letter-spacing:0.06em; }
-        .logo-fallback span b { color:#e8303a; }
-        @keyframes slideDown { to { opacity:1; transform:translateY(0); } }
+/* Shimmer */
+.card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(108deg,transparent 38%,rgba(255,255,255,0.04) 50%,transparent 62%);
+  background-size:250% 250%;
+  animation:shimmer 3.5s ease-in-out 1.4s infinite;
+  pointer-events:none;
+}
+@keyframes shimmer{0%{background-position:220% 0}100%{background-position:-220% 0}}
 
-        /* Card */
-        .card {
-            background: linear-gradient(135deg,rgba(16,30,48,0.97),rgba(12,21,37,0.92));
-            border: 1px solid ${c.cardBorder};
-            border-radius:28px; padding:3.5rem 2.5rem 3rem;
-            text-align:center; max-width:400px; width:100%;
-            position:relative; overflow:hidden;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03) inset, 0 1px 0 rgba(255,255,255,0.07) inset;
-            opacity:0; transform:translateY(44px) scale(0.95);
-            animation:cardRise 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s forwards;
-        }
-        @keyframes cardRise { to { opacity:1; transform:translateY(0) scale(1); } }
+/* Top glow bar */
+.card-bar{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:55%;height:2.5px;
+  background:linear-gradient(90deg,transparent,var(--ring),var(--ring2),transparent);
+  border-radius:0 0 3px 3px;
+  animation:barPulse 2.5s ease-in-out infinite alternate;
+}
+@keyframes barPulse{from{opacity:0.5}to{opacity:1;filter:blur(1.5px)}}
 
-        /* Shimmer sweep */
-        .card::before {
-            content:''; position:absolute; inset:0;
-            background: linear-gradient(105deg,transparent 40%,${c.cardShimmer} 50%,transparent 60%);
-            animation: shimmer 4.5s ease-in-out 1.8s infinite;
-        }
-        @keyframes shimmer { 0%{transform:translateX(-100%);} 100%{transform:translateX(200%);} }
+/* Corner glow accents */
+.card-corner{
+  position:absolute;width:80px;height:80px;
+  background:radial-gradient(circle at corner, var(--ring)18, transparent 70%);
+  pointer-events:none;
+}
+.card-corner.tl{top:0;left:0;background:radial-gradient(circle at top left,var(--ring)22,transparent 70%);}
+.card-corner.br{bottom:0;right:0;background:radial-gradient(circle at bottom right,var(--ring2)15,transparent 70%);}
 
-        /* Top accent line */
-        .card::after {
-            content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
-            background: linear-gradient(90deg,transparent,${c.topLine},transparent);
-            animation: lineGlow 2.5s ease-in-out 1.3s infinite alternate;
-        }
-        @keyframes lineGlow { from{opacity:0.35;} to{opacity:1; box-shadow:0 0 12px ${c.accentColor};} }
+/* ── Card inner layout (portrait: column, landscape: row) ── */
+.card-inner{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+}
+.card-text{width:100%;}
 
-        /* Corner glow */
-        .corner-glow {
-            position:absolute; width:200px; height:200px; border-radius:50%;
-            background: radial-gradient(circle, ${c.cardShimmer.replace('0.0', '0.1')}, transparent 70%);
-            pointer-events:none;
-        }
-        .corner-glow.tl { top:-80px; left:-80px; }
-        .corner-glow.br { bottom:-80px; right:-80px; }
+/* ── Icon ring ── */
+.icon-ring{
+  position:relative;width:114px;height:114px;
+  margin:0 auto 1.9rem;
+}
+.ring-svg{position:absolute;inset:0;width:100%;height:100%;}
+.r-spin{stroke:var(--ring);stroke-width:1.2;fill:none;opacity:0.28;
+  stroke-dasharray:7 17;
+  animation:rSpin 7s linear infinite;transform-origin:center;}
+.r-outer{stroke:var(--ring);stroke-width:1.5;fill:none;
+  stroke-dasharray:224;stroke-dashoffset:224;
+  animation:drawR 1s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;}
+.r-inner{stroke:var(--ring2);stroke-width:0.8;fill:none;opacity:0.5;
+  stroke-dasharray:175;stroke-dashoffset:175;
+  animation:drawR 1s cubic-bezier(0.16,1,0.3,1) 0.85s forwards;}
+@keyframes drawR{to{stroke-dashoffset:0}}
+@keyframes rSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-        /* Icon ring */
-        .icon-wrap {
-            position:relative; width:108px; height:108px; margin:0 auto 2rem;
-            opacity:0; transform:scale(0.4) translateY(20px);
-            animation:iconPop 0.85s cubic-bezier(0.34,1.56,0.64,1) 0.95s forwards;
-        }
-        @keyframes iconPop { to { opacity:1; transform:scale(1) translateY(0); } }
+/* Pulse rings */
+.pulse-ring{
+  position:absolute;inset:-10px;border-radius:50%;
+  border:1.5px solid var(--ring);opacity:0;
+  animation:pulseR 2.4s ease-out 1.5s infinite;
+}
+.pulse-ring:nth-child(2){animation-delay:2.1s;}
+@keyframes pulseR{
+  0%{transform:scale(0.88);opacity:0.6}
+  100%{transform:scale(1.35);opacity:0}
+}
 
-        ${c.iconCSS}
+/* Main icon */
+.main-icon-svg{
+  position:absolute;top:50%;left:50%;
+  width:52px;height:52px;
+  opacity:0;transform:translate(-50%,-50%) scale(0.3) rotate(-15deg);
+  animation:iconPop 0.75s cubic-bezier(0.34,1.56,0.64,1) 1s forwards, iconBob 3.2s ease-in-out 2s infinite;
+}
+@keyframes iconPop{to{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}}
+@keyframes iconBob{
+  0%,100%{margin-top:0px}
+  50%{margin-top:-8px}
+}
 
-        /* Text */
-        .title {
-            font-family:'Syne',sans-serif; font-size:2.7rem; font-weight:800; line-height:1; margin-bottom:1rem;
-            opacity:0; transform:translateY(15px); animation:textUp 0.6s ease 1.25s forwards;
-            background:${c.titleGradient};
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-        }
-        @keyframes textUp { to { opacity:1; transform:translateY(0); } }
+/* Particles */
+.particle{position:absolute;border-radius:50%;opacity:0;}
+@keyframes pf{0%{opacity:1}65%{opacity:0.5}100%{opacity:0}}
+${particleCSS}
 
-        .divider {
-            width:42px; height:2px; background:${c.divider};
-            border-radius:2px; margin:1.2rem auto;
-            opacity:0; animation:fadeIn 0.5s ease 1.6s forwards;
-            box-shadow: 0 0 10px ${c.accentColor}55;
-        }
-        @keyframes fadeIn { to { opacity:1; } }
+/* ── Text ── */
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.9rem,7vw,2.5rem);
+  font-weight:800;letter-spacing:-0.025em;line-height:1;
+  margin-bottom:0.85rem;
+  background:linear-gradient(135deg,var(--text) 0%,var(--ring) 55%,var(--ring2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  opacity:0;transform:translateY(14px);
+  animation:txtIn 0.6s ease-out 1.15s forwards;
+}
+p{
+  font-size:1.02rem;font-weight:300;color:var(--muted);line-height:1.7;
+  opacity:0;transform:translateY(14px);
+  animation:txtIn 0.6s ease-out 1.3s forwards;
+}
+.aw{font-weight:500;color:var(--ring);-webkit-text-fill-color:var(--ring);}
+@keyframes txtIn{to{opacity:1;transform:translateY(0)}}
 
-        .subtitle {
-            font-size:1.05rem; line-height:1.75; color:var(--muted); font-weight:300;
-            opacity:0; transform:translateY(10px); animation:textUp 0.6s ease 1.45s forwards;
-        }
-        .accent-word { color:${c.accentColor}; font-weight:600; }
+/* Divider */
+hr{
+  border:none;width:44px;height:2px;margin:1.2rem auto;
+  background:linear-gradient(90deg,transparent,var(--ring),transparent);
+  border-radius:2px;
+  opacity:0;animation:txtIn 0.6s ease-out 1.42s forwards;
+}
 
-        ${c.extraBlock.length > 0 ? '' : ''}
+/* Brand tagline */
+.tagline{
+  margin-top:2rem;
+  font-family:'Syne',sans-serif;font-size:0.6rem;
+  font-weight:700;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--muted);
+  opacity:0;animation:txtIn 0.6s ease-out 1.55s forwards;
+}
+.tagline span{color:var(--accent);}
 
-        /* Footer */
-        .powered {
-            margin-top:2rem; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase;
-            color:rgba(94,122,148,0.42);
-            opacity:0; animation:fadeIn 0.5s ease 2.2s forwards;
-        }
-        .powered span { color:rgba(232,48,58,0.55); }
-    </style>
+/* ── Scanline overlay (subtle CRT feel) ── */
+body::after{
+  content:'';position:fixed;inset:0;z-index:999;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+}
+
+/* ════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════ */
+
+/* ── Tall / large desktop (>= 1024px) ── */
+@media (min-width:1024px){
+  .card{
+    padding:3.5rem 3.2rem 3rem;
+    width:min(55vw,460px);
+    border-radius:36px;
+  }
+  .logo-img{height:46px;}
+  .logo-wrap{margin-bottom:2.8rem;}
+  .icon-ring{width:130px;height:130px;margin-bottom:2.2rem;}
+  h1{font-size:2.8rem;}
+  p{font-size:1.1rem;}
+  .tagline{font-size:0.65rem;margin-top:2.4rem;}
+}
+
+/* ── Tablet landscape (768px – 1023px) ── */
+@media (min-width:768px) and (max-width:1023px){
+  .card{
+    padding:3rem 2.8rem 2.6rem;
+    width:min(70vw,420px);
+    border-radius:32px;
+  }
+  .logo-img{height:42px;}
+  .icon-ring{width:120px;height:120px;}
+  h1{font-size:2.4rem;}
+  p{font-size:1.05rem;}
+}
+
+/* ── Tablet portrait / large phone (480px – 767px) ── */
+@media (min-width:480px) and (max-width:767px){
+  .card{
+    padding:2.6rem 2.2rem 2.2rem;
+    width:min(82vw,400px);
+    border-radius:28px;
+  }
+  .logo-img{height:38px;}
+  .logo-wrap{margin-bottom:2rem;}
+  .icon-ring{width:108px;height:108px;margin-bottom:1.6rem;}
+  h1{font-size:2.1rem;}
+  p{font-size:1rem;}
+}
+
+/* ── Small phone (360px – 479px) ── */
+@media (max-width:479px){
+  html,body{overflow-y:auto;}          /* allow scroll on tiny screens */
+  .scene{
+    height:auto;min-height:100vh;
+    padding:2rem 0 2.5rem;
+  }
+  .card{
+    padding:2.2rem 1.6rem 2rem;
+    width:min(92vw,360px);
+    border-radius:24px;
+  }
+  .logo-img{height:32px;}
+  .logo-wrap{margin-bottom:1.6rem;}
+  .logo-text{font-size:1rem;}
+  .icon-ring{
+    width:96px;height:96px;
+    margin-bottom:1.4rem;
+  }
+  .main-icon-svg{width:44px;height:44px;}
+  h1{font-size:1.8rem;margin-bottom:0.7rem;}
+  p{font-size:0.95rem;line-height:1.6;}
+  hr{margin:1rem auto;}
+  .tagline{font-size:0.56rem;margin-top:1.5rem;letter-spacing:0.2em;}
+  /* Shrink blobs so they don't dominate small screens */
+  .b1{width:260px;height:260px;top:-80px;right:-80px;}
+  .b2{width:220px;height:220px;bottom:-70px;left:-70px;}
+  .b3{width:160px;height:160px;}
+}
+
+/* ── Very small / legacy phones (< 360px) ── */
+@media (max-width:359px){
+  .card{
+    padding:1.8rem 1.2rem 1.6rem;
+    width:94vw;
+    border-radius:20px;
+  }
+  .icon-ring{width:84px;height:84px;margin-bottom:1.2rem;}
+  .main-icon-svg{width:38px;height:38px;}
+  h1{font-size:1.55rem;}
+  p{font-size:0.88rem;}
+  .logo-img{height:28px;}
+  .logo-text{font-size:0.9rem;}
+}
+
+/* ── Landscape mode on mobile (short viewport) ── */
+@media (max-height:500px) and (orientation:landscape){
+  html,body{overflow-y:auto;}
+  .scene{height:auto;min-height:100vh;padding:1.2rem 0 1.5rem;flex-direction:row;flex-wrap:wrap;gap:0;justify-content:center;}
+  .logo-wrap{width:100%;margin-bottom:1rem;}
+  .card{
+    padding:1.6rem 2rem 1.5rem;
+    width:min(85vw,500px);
+    border-radius:20px;
+  }
+  /* Side-by-side icon + text layout on landscape */
+  .card-inner{display:flex;align-items:center;gap:1.8rem;text-align:left;}
+  .icon-ring{width:88px;height:88px;flex-shrink:0;margin:0;}
+  h1{font-size:1.7rem;margin-bottom:0.5rem;}
+  p{font-size:0.9rem;}
+  hr{margin:0.8rem 0;}
+  .tagline{margin-top:1rem;}
+  /* Reduce blob sizes */
+  .b1,.b2,.b3{display:none;}
+}
+</style>
 </head>
 <body>
 
-<canvas id="particles"></canvas>
-<div class="grid-overlay"></div>
-<div class="scanline"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-${c.extraHTML}
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
 
 <div class="scene">
 
-    <div class="logo-wrap">
-        <img src="/assets/Logo.png" alt="ChargeZone"
-             onerror="this.style.display='none'; this.parentElement.querySelector('.logo-fallback').style.display='flex'">
-        <div class="logo-fallback">
-            <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
-                <path d="M18 3 L31 18 L22 18 L18 33 L5 18 L14 18 Z" fill="#e8303a"/>
-                <path d="M18 9 L27 18 L21 18 L18 27 L9 18 L15 18 Z" fill="rgba(232,48,58,0.3)"/>
-            </svg>
-            <span>CHARGE<b>ZONE</b></span>
-        </div>
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <img src="frontend/src/assets/Logo.png" alt="ChargeZone" class="logo-img"
+         onerror="this.style.display='none'; document.getElementById('fl').style.display='block';">
+    <div id="fl" style="display:none;">
+      <div class="logo-text">CHARGE<em>ZONE</em>&reg;</div>
+      <div class="logo-sub">Powering the Future</div>
     </div>
+  </div>
 
-    <div class="card">
-        <div class="corner-glow tl"></div>
-        <div class="corner-glow br"></div>
+  <!-- Card -->
+  <div class="card">
+    <div class="card-bar"></div>
+    <div class="card-corner tl"></div>
+    <div class="card-corner br"></div>
 
-        <div class="icon-wrap">
-            ${c.iconInner}
-        </div>
-
-        <h1 class="title">${c.title}</h1>
-        <div class="divider"></div>
-        <p class="subtitle">${c.subtitle} <span class="accent-word">${c.accentText}</span>${c.accentEnd}</p>
-
-        ${c.extraBlock}
+    <div class="card-inner">
+      <!-- Icon -->
+      <div class="icon-ring">
+        ${particleHTML}
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <svg class="ring-svg" viewBox="0 0 114 114">
+          <circle class="r-spin"  cx="57" cy="57" r="52"/>
+          <circle class="r-outer" cx="57" cy="57" r="52"/>
+          <circle class="r-inner" cx="57" cy="57" r="41"/>
+        </svg>
+        ${isPositive ? thankYouIcon : awesomeIcon}
+      </div>
+      <div class="card-text">
+        <h1>${title}</h1>
+        <hr>
+        <p>${subtitle.replace(accentWord, `<span class="aw">${accentWord}</span>`)}</p>
+        <div class="tagline"><span>ChargeZone</span> &mdash; Powering the Future</div>
+      </div>
     </div>
+  </div>
 
-    <p class="powered">Powered by <span>ChargeZone</span> &middot; Powering the Future</p>
 </div>
-
-<script>
-    // ── Particle System ──
-    const canvas = document.getElementById('particles');
-    const ctx = canvas.getContext('2d');
-    let W, H;
-    const particles = [];
-
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    resize(); window.addEventListener('resize', resize);
-
-    const pColors = ${c.particleColors};
-
-    class Particle {
-        constructor() { this.reset(); this.life = Math.random() * this.maxLife; }
-        reset() {
-            this.x = Math.random() * W;
-            this.y = Math.random() * H;
-            this.r = Math.random() * 1.4 + 0.3;
-            this.vx = (Math.random() - 0.5) * 0.28;
-            this.vy = -(Math.random() * 0.38 + 0.08);
-            this.life = 0;
-            this.maxLife = Math.random() * 220 + 100;
-            this.color = pColors[Math.floor(Math.random() * pColors.length)];
-        }
-        update() {
-            this.x += this.vx; this.y += this.vy; this.life++;
-            if (this.life >= this.maxLife) this.reset();
-        }
-        draw() {
-            const p = this.life / this.maxLife;
-            const a = p < 0.2 ? (p / 0.2) : (1 - (p - 0.2) / 0.8);
-            ctx.globalAlpha = a * 0.48;
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
-    for (let i = 0; i < 65; i++) particles.push(new Particle());
-
-    function animate() {
-        ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => { p.update(); p.draw(); });
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // ── Burst effect ──
-    ${c.extraJS}
-<\/script>
 </body>
 </html>`;
         };
 
         if (type === "yes") {
-            return res.send(getResponseHtml("yes"));
+            return res.send(getResponseHtml({
+                title: "Thank You!",
+                subtitle: "Our team will contact you within 24 hours.",
+                accentWord: "24 hours",
+                variant: "positive",
+            }));
         }
 
-        return res.send(getResponseHtml("no"));
+        return res.send(getResponseHtml({
+            title: "Awesome!",
+            subtitle: "We're glad you had a great experience today.",
+            accentWord: "great experience",
+            variant: "awesome",
+        }));
 
     } catch (err) {
         console.error("❌ Feedback Error:", err.message);
