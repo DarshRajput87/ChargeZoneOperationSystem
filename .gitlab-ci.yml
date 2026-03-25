@@ -1,46 +1,60 @@
-script:
-  - export RELEASE=$(date +%s)
+stages:
+  - deploy
 
-  # create release directory
-  - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
+deploy_backend:
+  stage: deploy
+  only:
+    - main
 
-  # sync files (FIXED: no backslashes)
-  - >
-    rsync -az --delete
-    --exclude='.git'
-    --exclude='node_modules'
-    --exclude='.env'
-    --exclude='logs'
-    ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+  before_script:
+    - apt-get update -y
+    - apt-get install -y openssh-client rsync
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
 
-  # install + start (FIXED PM2)
-  - >
-    ssh $EC2_USER@$EC2_HOST "
-      set -e
-      cd $PROJECT_PATH/releases/$RELEASE/backend
-      npm ci --omit=dev
-      ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current
-      pm2 delete server || true
-      pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
-      pm2 save
-    "
+  script:
+    - export RELEASE=$(date +%s)
 
-  # cleanup old releases
-  - >
-    ssh $EC2_USER@$EC2_HOST "
-      cd $PROJECT_PATH/releases
-      echo 'Cleaning old releases...'
-      ls -dt */ | tail -n +4 | xargs -r rm -rf
-    "
+    # create release directory
+    - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
 
-  # disk safety check
-  - >
-    ssh $EC2_USER@$EC2_HOST "
-      USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//')
-      echo \"Disk usage: \$USAGE%\"
-      if [ \"\$USAGE\" -gt 85 ]; then
-        echo 'High disk usage, aggressive cleanup...'
+    # rsync (fixed YAML)
+    - >
+      rsync -az --delete
+      --exclude='.git'
+      --exclude='node_modules'
+      --exclude='.env'
+      --exclude='logs'
+      ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+
+    # install + start
+    - >
+      ssh $EC2_USER@$EC2_HOST "
+        set -e
+        cd $PROJECT_PATH/releases/$RELEASE/backend
+        npm ci --omit=dev
+        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current
+        pm2 delete server || true
+        pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
+        pm2 save
+      "
+
+    # cleanup
+    - >
+      ssh $EC2_USER@$EC2_HOST "
         cd $PROJECT_PATH/releases
-        ls -dt */ | tail -n +3 | xargs -r rm -rf
-      fi
-    "
+        ls -dt */ | tail -n +4 | xargs -r rm -rf
+      "
+
+    # disk safety
+    - >
+      ssh $EC2_USER@$EC2_HOST "
+        USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//')
+        if [ \"\$USAGE\" -gt 85 ]; then
+          cd $PROJECT_PATH/releases
+          ls -dt */ | tail -n +3 | xargs -r rm -rf
+        fi
+      "
