@@ -36,9 +36,10 @@ deploy_backend:
         set -e
         cd $PROJECT_PATH/releases/$RELEASE/backend
         npm ci --omit=dev
-        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current
+        ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
+        ln -sfn $PROJECT_PATH/shared/.env $PROJECT_PATH/current/backend/.env &&
         pm2 delete server || true
-        pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
+        pm2 start $PROJECT_PATH/current/backend/src/server.js --name server &&
         pm2 save
       "
 
