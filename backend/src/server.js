@@ -12,6 +12,9 @@ const { generateFaultyAnalysis } = require("./modules/faulty-analysis/faultyAnal
 
 const PORT = process.env.PORT || 5000;
 
+// Suppress deprecated 'new' option warning
+mongoose.set('returnDocument', 'after');
+
 
 // =====================================================
 // 🔵 CONNECT COE DATABASE (Local)
