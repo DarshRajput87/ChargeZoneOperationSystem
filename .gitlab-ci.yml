@@ -4,45 +4,43 @@ script:
   # create release directory
   - ssh $EC2_USER@$EC2_HOST "mkdir -p $PROJECT_PATH/releases/$RELEASE"
 
-  # sync files (optimized)
-  - rsync -az --delete \
-      --exclude='.git' \
-      --exclude='node_modules' \
-      --exclude='.env' \
-      --exclude='logs' \
-      ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
+  # sync files (FIXED: no backslashes)
+  - >
+    rsync -az --delete
+    --exclude='.git'
+    --exclude='node_modules'
+    --exclude='.env'
+    --exclude='logs'
+    ./ $EC2_USER@$EC2_HOST:$PROJECT_PATH/releases/$RELEASE
 
-  # install + start
-  - ssh $EC2_USER@$EC2_HOST "
+  # install + start (FIXED PM2)
+  - >
+    ssh $EC2_USER@$EC2_HOST "
       set -e
-
-      cd $PROJECT_PATH/releases/$RELEASE/backend &&
-
-      npm ci --omit=dev &&
-
-      ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current &&
-
-      pm2 reload server || pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
+      cd $PROJECT_PATH/releases/$RELEASE/backend
+      npm ci --omit=dev
+      ln -sfn $PROJECT_PATH/releases/$RELEASE $PROJECT_PATH/current
+      pm2 delete server || true
+      pm2 start $PROJECT_PATH/current/backend/src/server.js --name server
+      pm2 save
     "
 
-  # 🔥 CLEANUP OLD RELEASES (MOST IMPORTANT)
-  - ssh $EC2_USER@$EC2_HOST "
-      cd $PROJECT_PATH/releases &&
-
-      echo 'Cleaning old releases...' &&
-
+  # cleanup old releases
+  - >
+    ssh $EC2_USER@$EC2_HOST "
+      cd $PROJECT_PATH/releases
+      echo 'Cleaning old releases...'
       ls -dt */ | tail -n +4 | xargs -r rm -rf
     "
 
-  # 🔍 DISK SAFETY CHECK (AUTO-PROTECTION)
-  - ssh $EC2_USER@$EC2_HOST "
-      USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//') &&
-
-      echo \"Disk usage: \$USAGE%\" &&
-
+  # disk safety check
+  - >
+    ssh $EC2_USER@$EC2_HOST "
+      USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//')
+      echo \"Disk usage: \$USAGE%\"
       if [ \"\$USAGE\" -gt 85 ]; then
-        echo 'High disk usage, aggressive cleanup...' &&
-        cd $PROJECT_PATH/releases &&
+        echo 'High disk usage, aggressive cleanup...'
+        cd $PROJECT_PATH/releases
         ls -dt */ | tail -n +3 | xargs -r rm -rf
       fi
     "
