@@ -3,9 +3,9 @@ import axios from "axios";
 import EVLoader from "../Dashboard/EVLoader";
 import "./FaultySLA.css";
 
-const BASE_URL = "https://api.chargezoneops.online/api/emsp-faulty-sessions";
-const SETTLEMENT_PREVIEW = "https://api.chargezoneops.online/api/settlement/preview";
-const SETTLEMENT_PUSH = "https://api.chargezoneops.online/api/settlement/push";
+const BASE_URL = "http://localhost:5000/api/emsp-faulty-sessions";
+const FAULTY_PREVIEW = `${BASE_URL}/preview`;
+const FAULTY_PUSH = `${BASE_URL}/push`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // helpers
@@ -225,6 +225,7 @@ export default function FaultyDashboard() {
     const [token, setToken] = useState("");
     const [pushing, setPushing] = useState(false);
     const [previewLoading, setPreviewLoading] = useState(false);
+    const [faultyPreviews, setFaultyPreviews] = useState([]); // Array of {url, payload, tenantId}
 
     // Filters
     const [searchBookingId, setSearchBookingId] = useState("");
@@ -315,11 +316,22 @@ export default function FaultyDashboard() {
                 setPreviewLoading(false);
             }
         } else {
-            setPayload(null);
-            setToken("");
-            setSettleMethod("script");
-            setSettleBookings(bookings);
-            setSettleSession(methodSession ?? sessions.find(s => s.bookingId === bookings[0]));
+            setPreviewLoading(true);
+            try {
+                const res = await axios.post(FAULTY_PREVIEW, { bookingIds: bookings });
+                if (!res.data.success) { alert(res.data.error); return; }
+
+                setFaultyPreviews(res.data.previews);
+                setPayload(null);
+                setToken("");
+                setSettleMethod("script");
+                setSettleBookings(bookings);
+                setSettleSession(methodSession ?? sessions.find(s => s.bookingId === bookings[0]));
+            } catch (err) {
+                alert("Failed to build faulty session preview: " + (err.response?.data?.error || err.message));
+            } finally {
+                setPreviewLoading(false);
+            }
         }
     };
 
@@ -329,6 +341,7 @@ export default function FaultyDashboard() {
         setToken("");
         setSettleMethod(null);
         setSettleBookings([]);
+        setFaultyPreviews([]);
     };
 
     const pushSettlement = async () => {
@@ -339,15 +352,16 @@ export default function FaultyDashboard() {
                 if (res.data.success) { alert("CDR pushed successfully"); fetchData(); }
                 else alert("Push failed");
             } else {
-                for (const bookingId of settleBookings) {
-                    const res = await axios.post(`${SETTLEMENT_PUSH}/script`, { bookingId });
-                    if (!res.data.success) { alert(`Script push failed for ${bookingId}`); break; }
+                const res = await axios.post(FAULTY_PUSH, { bookingIds: settleBookings });
+                if (res.data.success) {
+                    alert("Faulty sessions pushed successfully");
+                    fetchData();
+                } else {
+                    alert("Push failed: " + (res.data.error || "Unknown error"));
                 }
-                alert("Script push completed");
-                fetchData();
             }
-        } catch {
-            alert("Settlement request failed");
+        } catch (err) {
+            alert("Settlement request failed: " + (err.response?.data?.error || err.message));
         } finally {
             setPushing(false);
             closeSettleModal();
@@ -723,6 +737,30 @@ export default function FaultyDashboard() {
                                     <summary>Preview CDR Payload</summary>
                                     <pre>{JSON.stringify(payload, null, 2)}</pre>
                                 </details>
+                            )}
+
+                            {faultyPreviews.length > 0 && (
+                                <div className="fsla-faulty-preview-container" style={{ marginTop: "16px" }}>
+                                    <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                        ChargeCloud API Preview
+                                    </div>
+                                    {faultyPreviews.map((p, idx) => (
+                                        <div key={idx} className="fsla-preview-item" style={{ background: "rgba(0,0,0,0.2)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)", marginBottom: "10px" }}>
+                                            <div style={{ fontSize: "10px", color: "#7eb8f7", marginBottom: "6px", fontFamily: "monospace", display: "flex", gap: "6px" }}>
+                                                <span style={{ color: "var(--green)", fontWeight: 700 }}>POST</span>
+                                                <span style={{ opacity: 0.8, wordBreak: "break-all" }}>{p.url}</span>
+                                            </div>
+                                            <details className="fsla-payload-preview" style={{ border: "none", background: "none", padding: 0 }}>
+                                                <summary style={{ fontSize: "11px", color: "var(--text-muted)", padding: 0 }}>
+                                                    View Push Payload ({p.sessionCount} session{p.sessionCount > 1 ? "s" : ""})
+                                                </summary>
+                                                <pre style={{ fontSize: "10px", marginTop: "8px", background: "rgba(0,0,0,0.3)", padding: "10px", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.04)" }}>
+                                                    {JSON.stringify(p.payload, null, 2)}
+                                                </pre>
+                                            </details>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
 

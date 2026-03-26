@@ -1,21 +1,20 @@
 const axios = require("axios");
 const { ObjectId } = require("mongodb");
 
-class FaultyPushService {
+class InProgressPushService {
 
   constructor(db) {
-    this.collection = db.collection("ocpi_emsp_faulty_session");
+    this.collection = db.collection("ocpi_emsp_in_progressbooking");
   }
 
   /**
-   * Build preview for a set of sessions
+   * Build preview for a set of in-progress sessions
    */
   async buildPreview(bookingIds) {
     if (!Array.isArray(bookingIds) || bookingIds.length === 0) {
       throw new Error("No booking IDs provided for preview");
     }
 
-    // Convert strings to ObjectIds for MongoDB match
     const queryIds = bookingIds.map(id => {
       try {
         return id.length === 24 ? new ObjectId(id) : id;
@@ -29,13 +28,12 @@ class FaultyPushService {
     }).toArray();
 
     if (!sessions.length) {
-      throw new Error("No matching faulty sessions found for the provided IDs");
+      throw new Error("No matching in-progress sessions found for the provided IDs");
     }
 
-    // Grouping by tenant for ChargeCloud API URL
     const tenantMap = {};
     for (const s of sessions) {
-      const tenantId = s.tenant || s.tenant_id; // Check both naming conventions
+      const tenantId = s.tenant || s.tenant_id;
       if (!tenantId) continue;
       if (!tenantMap[tenantId]) tenantMap[tenantId] = { bookings: [], docs: [] };
       tenantMap[tenantId].bookings.push({ booking_id: String(s.bookingId) });
@@ -47,14 +45,14 @@ class FaultyPushService {
       url: `https://api.chargecloud.net/ocpi/emsp/2.2/ocpifaultysession/${tenantId}`,
       payload: data.bookings,
       sessionCount: data.bookings.length,
-      originalIds: data.docs.map(d => d.bookingId) // Keep exactly as in DB
+      originalIds: data.docs.map(d => d.bookingId)
     }));
 
     return previews;
   }
 
   /**
-   * Execute push for specific sessions
+   * Execute push for specific in-progress sessions
    */
   async executePush(bookingIds) {
     const previews = await this.buildPreview(bookingIds);
@@ -69,12 +67,11 @@ class FaultyPushService {
           }
         });
 
-        // ── MARK DB RECORDS AS CLOSED (Using original IDs) ──
         await this.collection.updateMany(
           { bookingId: { $in: preview.originalIds } },
           {
             $set: {
-              still_exist: false,
+              status: "completed",
               ScriptClosed: "yes",
               ui_updated: true,
               settledAt: new Date()
@@ -89,9 +86,8 @@ class FaultyPushService {
         });
 
       } catch (err) {
-        console.error(`Faulty push failed for ${preview.tenantId}:`, err.response?.data || err.message);
+        console.error(`In-progress push failed for ${preview.tenantId}:`, err.response?.data || err.message);
 
-        // Mark as failed in DB
         await this.collection.updateMany(
           { bookingId: { $in: preview.originalIds } },
           {
@@ -114,4 +110,4 @@ class FaultyPushService {
   }
 }
 
-module.exports = FaultyPushService;
+module.exports = InProgressPushService;

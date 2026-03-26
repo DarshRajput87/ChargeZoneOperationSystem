@@ -12,14 +12,31 @@ class InProgressService {
     if (partyId) query.partyId = partyId;
     if (status) query.status = status;
 
+    // Filter out 'completed' sessions older than 10 minutes
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
+    // We want: (status != 'completed') OR (status == 'completed' AND bookingEndTime >= tenMinutesAgo)
+    const visibilityFilter = {
+      $or: [
+        { status: { $ne: "completed" } },
+        {
+          status: "completed",
+          bookingEndTime: { $gte: tenMinutesAgo }
+        }
+      ]
+    };
+
+    // Combine with existing filters
+    const finalQuery = { $and: [query, visibilityFilter] };
+
     if (cursor) {
-      query._id = { $lt: new ObjectId(cursor) };
+      finalQuery._id = { $lt: new ObjectId(cursor) };
     }
 
     const parsedLimit = parseInt(limit) || 10;
 
     const data = await this.collection
-      .find(query)
+      .find(finalQuery)
       .sort({ _id: -1 })
       .limit(parsedLimit)
       .toArray();

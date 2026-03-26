@@ -1,39 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const BASE_URL = "https://api.chargezoneops.online/api/emsp-in-progress";
-const SETTLEMENT_PREVIEW = "https://api.chargezoneops.online/api/settlement/preview";
-const SETTLEMENT_PUSH = "https://api.chargezoneops.online/api/settlement/push";
+const BASE_URL = "http://localhost:5000/api/emsp-in-progress";
+const SETTLEMENT_PREVIEW = "http://localhost:5000/api/settlement/preview";
+const SETTLEMENT_PUSH = "http://localhost:5000/api/settlement/push";
+const SCRIPT_PUSH = "http://localhost:5000/api/emsp-in-progress/script-push";
 
-// ─── How long completed sessions stay visible (ms) ───────────────────────────
-const VISIBILITY_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const LS_KEY = "emsp_completed_at_map";       // localStorage key
-
-// ─── Persist helpers ──────────────────────────────────────────────────────────
-function loadCompletedMap() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveCompletedMap(map) {
-  try {
-    // Prune entries older than the visibility window before saving
-    const cutoff = Date.now() - VISIBILITY_WINDOW_MS;
-    const pruned = Object.fromEntries(
-      Object.entries(map).filter(([, ts]) => ts > cutoff)
-    );
-    localStorage.setItem(LS_KEY, JSON.stringify(pruned));
-    return pruned;
-  } catch {
-    return map;
-  }
-}
 
 /* ───────── Deep flatten ───────── */
 function flattenObject(obj, prefix = "") {
@@ -130,36 +104,6 @@ function ThWithTip({ label, tip }) {
   );
 }
 
-/* ───────── Countdown cell ───────── */
-function CountdownCell({ completedAt }) {
-  const expiresAt = completedAt + VISIBILITY_WINDOW_MS;
-  const [remaining, setRemaining] = useState(Math.max(0, expiresAt - Date.now()));
-
-  useEffect(() => {
-    const id = setInterval(() => setRemaining(Math.max(0, expiresAt - Date.now())), 1000);
-    return () => clearInterval(id);
-  }, [expiresAt]);
-
-  if (remaining === 0) return <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Expiring…</span>;
-
-  const totalSecs = Math.floor(remaining / 1000);
-  const m = Math.floor(totalSecs / 60);
-  const s = totalSecs % 60;
-  const pct = Math.min(100, (remaining / VISIBILITY_WINDOW_MS) * 100);
-  const color = pct < 25 ? "#f87171" : pct < 60 ? "#fbbf24" : "#4ade80";
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", minWidth: "90px" }}>
-      <div style={{ fontFamily: "monospace", fontSize: "13px", fontWeight: 600, color, letterSpacing: "0.05em" }}>
-        {String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
-      </div>
-      <div style={{ width: "80px", height: "3px", borderRadius: "2px", background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: "2px", transition: "width 1s linear, background 0.5s" }} />
-      </div>
-      <div style={{ fontSize: "9.5px", color: "var(--text-muted)", letterSpacing: "0.02em" }}>until removed</div>
-    </div>
-  );
-}
 
 /* ───────── Field descriptions ───────── */
 const FIELD_DESCRIPTIONS = {
@@ -277,6 +221,54 @@ function MethodSelectionModal({ session, onSelect, onClose }) {
   );
 }
 
+/* ───────── Script Confirm Modal ───────── */
+function ScriptConfirmModal({ session, onConfirm, onClose, pushing }) {
+  return (
+    <div className="ipsl-modal" onClick={onClose}>
+      <div className="ipsl-modal-content ipsl-method-select-modal" onClick={e => e.stopPropagation()}
+        style={{ width: "480px", background: "#0b1520", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "20px", overflow: "hidden" }}>
+
+        <div className="ipsl-modal-header"
+          style={{ background: "linear-gradient(135deg, rgba(239,68,68,0.09) 0%, transparent 55%)", borderBottom: "1px solid rgba(239,68,68,0.12)", padding: "22px 26px 20px" }}>
+          <div className="ipsl-settle-header-left">
+            <span className="ipsl-settle-eyebrow">Script Settlement</span>
+            <h3 style={{ fontSize: "17px", fontWeight: 600, letterSpacing: "-0.02em" }}>Confirm Auto-Close</h3>
+          </div>
+          <button className="ipsl-modal-x" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="ipsl-settle-identity">
+          <div className="ipsl-id-chip"><span className="ipsl-chip-label">Booking ID</span><span className="ipsl-chip-mono">{session.bookingId}</span></div>
+          <div className="ipsl-id-chip"><span className="ipsl-chip-label">Party</span><span className="ipsl-chip-mono">{session.partyId}</span></div>
+          <div className="ipsl-id-chip"><span className="ipsl-chip-label">Status</span><span className="ipsl-chip-status">{session.status}</span></div>
+        </div>
+
+        <div className="ipsl-warning-banner">
+          <span className="ipsl-warning-icon">⚠</span>
+          <span>
+            The script will automatically build and push the CDR to the operator. <strong>This action cannot be undone.</strong>
+          </span>
+        </div>
+
+        <div style={{ padding: "12px 22px 6px", fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.7 }}>
+          <p>No payload preview is shown for script settlement. The system will use the session data as-is to construct and push the CDR immediately upon confirmation.</p>
+        </div>
+
+        <div className="ipsl-modal-footer settle" style={{ padding: "16px 22px" }}>
+          <button className="ipsl-modal-close-btn" onClick={onClose} disabled={pushing}>Cancel</button>
+          <button className="ipsl-btn-settle-confirm" onClick={onConfirm} disabled={pushing}>
+            {pushing
+              ? <><span className="ipsl-btn-spinner" />Running Script…</>
+              : <><span className="ipsl-btn-icon">⚡</span>Run Script</>
+            }
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    Dashboard
    ═══════════════════════════════════════════════════════════ */
@@ -287,28 +279,19 @@ export default function InProgressDashboard() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [methodSession, setMethodSession] = useState(null);
   const [settleSession, setSettleSession] = useState(null);
+  const [scriptSession, setScriptSession] = useState(null);   // ← script confirm modal
   const [payload, setPayload] = useState(null);
   const [token, setToken] = useState("");
   const [pushing, setPushing] = useState(false);
+  const [scriptPushing, setScriptPushing] = useState(false);  // ← script loading state
   const [searchBookingId, setSearchBookingId] = useState("");
   const [selectedParty, setSelectedParty] = useState("all");
-
-  // ── Persisted completed-at map (survives refresh) ─────────────────────────
-  // Shape: { [bookingId: string]: number (ms timestamp) }
-  const completedAtMap = useRef(loadCompletedMap());
 
   // Pagination
   const limit = 10;
   const [cursorHistory, setCursorHistory] = useState([null]);
   const [currentPage, setCurrentPage] = useState(0);
   const [nextCursor, setNextCursor] = useState(null);
-
-  // 1-second tick — re-evaluates visible rows & drives countdown re-renders
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   useEffect(() => {
     const cursor = cursorHistory[currentPage];
@@ -321,24 +304,7 @@ export default function InProgressDashboard() {
     setLoading(true);
     try {
       const res = await axios.get(BASE_URL, { params: { cursor, limit } });
-      const incoming = res.data.data;
-
-      // Record first-seen timestamp for any newly-completed session,
-      // then immediately persist the whole map to localStorage.
-      let changed = false;
-      incoming.forEach(s => {
-        const done = (s.status || "").toLowerCase() === "completed";
-        if (done && !completedAtMap.current[s.bookingId]) {
-          completedAtMap.current[s.bookingId] =
-            s.bookingEndTime ? new Date(s.bookingEndTime).getTime() : Date.now();
-          changed = true;
-        }
-      });
-      if (changed) {
-        completedAtMap.current = saveCompletedMap(completedAtMap.current);
-      }
-
-      setSessions(incoming);
+      setSessions(res.data.data);
       setNextCursor(res.data.nextCursor);
       setLastUpdated(new Date());
     } catch (e) {
@@ -376,45 +342,76 @@ export default function InProgressDashboard() {
     (s.status || "").toLowerCase() === "in_progress" &&
     calculateSLA(s.bookingStartTime).hours >= 48;
 
+  /* ── Method selection: branch on cdr vs script ── */
   const handleMethodSelect = async (method) => {
     const session = methodSession;
     setMethodSession(null);
+
+    if (method === "script") {
+      // Show script confirm modal — no preview fetch needed
+      setScriptSession(session);
+      return;
+    }
+
+    // CDR Builder path — fetch preview payload then show settle modal
     try {
       const res = await axios.get(`${SETTLEMENT_PREVIEW}/${session.bookingId}`);
       if (!res.data.success) { alert(res.data.error); return; }
       setPayload(res.data.payload);
       setToken(res.data.token);
       setSettleSession(session);
-    } catch { alert("Failed to build settlement payload"); }
+    } catch {
+      alert("Failed to build settlement payload");
+    }
   };
 
+  /* ── CDR Builder: push ── */
   const pushSettlement = async () => {
     if (!payload) return;
     setPushing(true);
     try {
       const res = await axios.post(SETTLEMENT_PUSH, { payload, token });
       if (res.data.success) {
-        if (settleSession) {
-          completedAtMap.current[settleSession.bookingId] = Date.now();
-          completedAtMap.current = saveCompletedMap(completedAtMap.current);
-        }
         alert("CDR pushed successfully");
-      } else alert("Push failed");
-    } catch { alert("Settlement request failed"); }
-    setPushing(false);
-    setSettleSession(null);
+        fetchData(cursorHistory[currentPage]);
+      } else {
+        alert("Push failed");
+      }
+    } catch {
+      alert("Settlement request failed");
+    } finally {
+      setPushing(false);
+      setSettleSession(null);
+    }
+  };
+
+  /* ── Script: push ── */
+  const pushScript = async () => {
+    if (!scriptSession) return;
+    setScriptPushing(true);
+    try {
+      const res = await axios.post(SCRIPT_PUSH, {
+        bookingIds: [scriptSession.bookingId]
+      });
+      if (res.data.success) {
+        alert("Session closed via script successfully");
+        fetchData(cursorHistory[currentPage]);
+      } else {
+        const firstError = res.data.results?.find(r => !r.success)?.error;
+        alert("Script push failed" + (firstError ? `: ${firstError}` : ""));
+      }
+    } catch {
+      alert("Script push request failed");
+    } finally {
+      setScriptPushing(false);
+      setScriptSession(null);
+    }
   };
 
   /* ── Derived ── */
   const partyOptions = ["all", ...Array.from(new Set(sessions.map(s => s.partyId).filter(Boolean))).sort()];
 
-  const now = Date.now();
   const visibleSessions = sessions.filter(s => {
-    const done = (s.status || "").toLowerCase() === "completed";
-    if (done) {
-      const at = completedAtMap.current[s.bookingId];
-      if (!at || now - at >= VISIBILITY_WINDOW_MS) return false;
-    }
     const matchId = !searchBookingId.trim() ||
       s.bookingId?.toLowerCase().includes(searchBookingId.trim().toLowerCase());
     const matchParty = selectedParty === "all" || s.partyId === selectedParty;
@@ -450,8 +447,7 @@ export default function InProgressDashboard() {
             )}
           </div>
           <p className="ipsl-page-subtitle">
-            Monitor active charging sessions and manage SLA settlements.
-            Completed sessions stay visible for <strong style={{ color: "var(--text-secondary)" }}>10 minutes</strong> after settlement, then are removed automatically.
+            Monitor active charging sessions and manage SLA settlements. Completed sessions are processed and moved to history automatically.
           </p>
         </div>
 
@@ -537,7 +533,6 @@ export default function InProgressDashboard() {
                 <ThWithTip label="Status" tip="in_progress = actively charging · completed = CDR pushed & session closed" />
                 <ThWithTip label="Party" tip="The EMSP party / operator that owns this session" />
                 <ThWithTip label="SLA Duration" tip="Time elapsed since session started. 🔴 ≥48h breach · 🟡 ≥24h warning · 🟢 on track" />
-                <ThWithTip label="Expires In" tip="Completed sessions are removed from view 10 minutes after settlement" />
                 <ThWithTip label="Settle" tip="Force-close a session breaching 48h SLA. Only active for in_progress sessions ≥ 48h" />
                 <ThWithTip label="Details" tip="View the full raw session record and all fields" />
               </tr>
@@ -546,18 +541,12 @@ export default function InProgressDashboard() {
               {visibleSessions.map(s => {
                 const { hours, minutes } = calculateSLA(s.bookingStartTime);
                 const isCompleted = (s.status || "").toLowerCase() === "completed";
-                const completedAt = completedAtMap.current[s.bookingId];
                 return (
                   <tr key={s._id} style={{ opacity: isCompleted ? 0.72 : 1, transition: "opacity 0.3s" }}>
                     <td><span className="ipsl-mono">{s.bookingId}</span></td>
                     <td><span className={getStatusBadgeClass(s.status)}>{s.status}</span></td>
                     <td><span className="ipsl-badge party">{s.partyId}</span></td>
                     <td><span className={getSLAClass(hours)}>{hours}h {minutes}m</span></td>
-                    <td>
-                      {isCompleted && completedAt
-                        ? <CountdownCell completedAt={completedAt} />
-                        : <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>—</span>}
-                    </td>
                     <td>
                       <button
                         className={`ipsl-btn-settle ${isSettleable(s) ? "active" : ""} ${isCompleted ? "completed" : ""}`}
@@ -594,6 +583,16 @@ export default function InProgressDashboard() {
       {/* ── Method Modal ── */}
       {methodSession && (
         <MethodSelectionModal session={methodSession} onSelect={handleMethodSelect} onClose={() => setMethodSession(null)} />
+      )}
+
+      {/* ── Script Confirm Modal ── */}
+      {scriptSession && (
+        <ScriptConfirmModal
+          session={scriptSession}
+          onConfirm={pushScript}
+          onClose={() => setScriptSession(null)}
+          pushing={scriptPushing}
+        />
       )}
 
       {/* ── View Modal ── */}
@@ -633,7 +632,7 @@ export default function InProgressDashboard() {
         </div>
       )}
 
-      {/* ── Settlement Modal ── */}
+      {/* ── Settlement Modal (CDR Builder) ── */}
       {settleSession && (
         <div className="ipsl-modal" onClick={() => setSettleSession(null)}>
           <div className="ipsl-modal-content ipsl-modal-settle" onClick={e => e.stopPropagation()}>
@@ -652,8 +651,7 @@ export default function InProgressDashboard() {
             <div className="ipsl-warning-banner">
               <span className="ipsl-warning-icon">⚠</span>
               <span>
-                This will forcefully close the session and push a CDR to the operator. <strong>This action cannot be undone.</strong>{" "}
-                The session will remain visible for <strong>10 minutes</strong> after settlement, then disappear automatically.
+                This will forcefully close the session and push a CDR to the operator. <strong>This action cannot be undone.</strong>
               </span>
             </div>
             {flatPayload.length > 0 && (
