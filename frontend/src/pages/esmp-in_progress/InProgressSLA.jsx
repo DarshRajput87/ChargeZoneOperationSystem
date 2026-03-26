@@ -3,10 +3,10 @@ import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const BASE_URL = "http://localhost:5000/api/emsp-in-progress";
-const SETTLEMENT_PREVIEW = "http://localhost:5000/api/settlement/preview";
-const SETTLEMENT_PUSH = "http://localhost:5000/api/settlement/push";
-const SCRIPT_PUSH = "http://localhost:5000/api/emsp-in-progress/script-push";
+const BASE_URL = "https://api.chargezoneops.online/api/emsp-in-progress";
+const SETTLEMENT_PREVIEW = "https://api.chargezoneops.online/api/settlement/preview";
+const SETTLEMENT_PUSH = "https://api.chargezoneops.online/api/settlement/push";
+const SCRIPT_PUSH = "https://api.chargezoneops.online/api/emsp-in-progress/script-push";
 
 
 /* ───────── Deep flatten ───────── */

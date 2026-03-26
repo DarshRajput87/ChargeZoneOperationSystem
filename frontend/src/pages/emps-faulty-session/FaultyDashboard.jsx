@@ -3,7 +3,7 @@ import axios from "axios";
 import EVLoader from "../Dashboard/EVLoader";
 import "./FaultySLA.css";
 
-const BASE_URL = "http://localhost:5000/api/emsp-faulty-sessions";
+const BASE_URL = "https://api.chargezoneops.online/api/emsp-faulty-sessions";
 const FAULTY_PREVIEW = `${BASE_URL}/preview`;
 const FAULTY_PUSH = `${BASE_URL}/push`;
 
