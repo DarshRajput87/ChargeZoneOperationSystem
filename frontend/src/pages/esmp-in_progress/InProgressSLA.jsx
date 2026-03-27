@@ -3,10 +3,11 @@ import axios from "axios";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const BASE_URL = "https://api.chargezoneops.online/api/emsp-in-progress";
-const SETTLEMENT_PREVIEW = "https://api.chargezoneops.online/api/settlement/preview";
-const SETTLEMENT_PUSH = "https://api.chargezoneops.online/api/settlement/push";
-const SCRIPT_PUSH = "https://api.chargezoneops.online/api/emsp-in-progress/script-push";
+const BASE_URL = "http://api.chargezoneops.online/api/emsp-in-progress";
+const SETTLEMENT_PREVIEW = "http://api.chargezoneops.online/api/settlement/preview";
+const SETTLEMENT_PUSH = "http://api.chargezoneops.online/api/settlement/push";
+const SCRIPT_PUSH = "http://api.chargezoneops.online/api/emsp-in-progress/script-push";
+const SCRIPT_PREVIEW = "http://api.chargezoneops.online/api/emsp-in-progress/script-preview";
 
 
 /* ───────── Deep flatten ───────── */
@@ -222,11 +223,11 @@ function MethodSelectionModal({ session, onSelect, onClose }) {
 }
 
 /* ───────── Script Confirm Modal ───────── */
-function ScriptConfirmModal({ session, onConfirm, onClose, pushing }) {
+function ScriptConfirmModal({ session, onConfirm, onClose, pushing, previewData }) {
   return (
     <div className="ipsl-modal" onClick={onClose}>
       <div className="ipsl-modal-content ipsl-method-select-modal" onClick={e => e.stopPropagation()}
-        style={{ width: "480px", background: "#0b1520", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "20px", overflow: "hidden" }}>
+        style={{ width: "540px", background: "#0b1520", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "20px", overflow: "hidden" }}>
 
         <div className="ipsl-modal-header"
           style={{ background: "linear-gradient(135deg, rgba(239,68,68,0.09) 0%, transparent 55%)", borderBottom: "1px solid rgba(239,68,68,0.12)", padding: "22px 26px 20px" }}>
@@ -250,9 +251,30 @@ function ScriptConfirmModal({ session, onConfirm, onClose, pushing }) {
           </span>
         </div>
 
-        <div style={{ padding: "12px 22px 6px", fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.7 }}>
-          <p>No payload preview is shown for script settlement. The system will use the session data as-is to construct and push the CDR immediately upon confirmation.</p>
-        </div>
+        {previewData && (
+          <div className="ipsl-api-preview">
+            <span className="ipsl-api-eyebrow">Chargecloud API Preview</span>
+            <div className="ipsl-api-url-row">
+              <span className="ipsl-api-method">POST</span>
+              <span className="ipsl-api-url">{previewData.url}</span>
+            </div>
+            <div className="ipsl-api-payload-box">
+              <div className="ipsl-api-payload-header">
+                <span style={{ fontSize: "8px", transform: "rotate(90deg)" }}>▶</span>
+                VIEW PUSH PAYLOAD (1 SESSION)
+              </div>
+              <div className="ipsl-api-payload-content">
+                {JSON.stringify(previewData.payload, null, 2)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!previewData && (
+          <div style={{ padding: "12px 22px 6px", fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.7 }}>
+            <p>Loading API preview…</p>
+          </div>
+        )}
 
         <div className="ipsl-modal-footer settle" style={{ padding: "16px 22px" }}>
           <button className="ipsl-modal-close-btn" onClick={onClose} disabled={pushing}>Cancel</button>
@@ -281,6 +303,7 @@ export default function InProgressDashboard() {
   const [settleSession, setSettleSession] = useState(null);
   const [scriptSession, setScriptSession] = useState(null);   // ← script confirm modal
   const [payload, setPayload] = useState(null);
+  const [scriptPreviewData, setScriptPreviewData] = useState(null); // ← script API preview
   const [token, setToken] = useState("");
   const [pushing, setPushing] = useState(false);
   const [scriptPushing, setScriptPushing] = useState(false);  // ← script loading state
@@ -292,6 +315,7 @@ export default function InProgressDashboard() {
   const [cursorHistory, setCursorHistory] = useState([null]);
   const [currentPage, setCurrentPage] = useState(0);
   const [nextCursor, setNextCursor] = useState(null);
+  const [totalCount, setTotalCount] = useState(0); // real total from DB
 
   useEffect(() => {
     const cursor = cursorHistory[currentPage];
@@ -306,6 +330,7 @@ export default function InProgressDashboard() {
       const res = await axios.get(BASE_URL, { params: { cursor, limit } });
       setSessions(res.data.data);
       setNextCursor(res.data.nextCursor);
+      setTotalCount(res.data.total || 0);
       setLastUpdated(new Date());
     } catch (e) {
       console.error(e);
@@ -348,8 +373,14 @@ export default function InProgressDashboard() {
     setMethodSession(null);
 
     if (method === "script") {
-      // Show script confirm modal — no preview fetch needed
-      setScriptSession(session);
+      try {
+        const res = await axios.get(`${SCRIPT_PREVIEW}/${session.bookingId}`);
+        if (!res.data.success) { alert(res.data.error || "Failed to fetch script preview"); return; }
+        setScriptPreviewData(res.data);
+        setScriptSession(session);
+      } catch {
+        alert("Failed to build script preview");
+      }
       return;
     }
 
@@ -424,7 +455,8 @@ export default function InProgressDashboard() {
 
   const flatPayload = payload ? flattenObject(payload) : [];
   const flatSession = selectedSession ? flattenObject(selectedSession) : [];
-  const showPagination = sessions.length >= 10;
+  // Only show pagination controls when we're not on the first page or there's more data to fetch
+  const showPagination = currentPage > 0 || (!!nextCursor && sessions.length === limit);
 
   return (
     <div className="ipsl-page">
@@ -468,7 +500,7 @@ export default function InProgressDashboard() {
           </div>
           <div className="ipsl-stat-divider" />
           <div className="ipsl-stat-pill total">
-            <span className="ipsl-stat-num">{sessions.length}</span>
+            <span className="ipsl-stat-num">{totalCount}</span>
             <span className="ipsl-stat-label">Total</span>
           </div>
         </div>
@@ -567,15 +599,115 @@ export default function InProgressDashboard() {
         )}
 
         {showPagination && (
-          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "16px", paddingBottom: "10px", paddingRight: "16px" }}>
-            <button disabled={currentPage === 0} onClick={goPrevPage}
-              style={{ padding: "7px 14px", borderRadius: "6px", background: currentPage === 0 ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", cursor: currentPage === 0 ? "not-allowed" : "pointer", opacity: currentPage === 0 ? 0.5 : 1, transition: "background 0.2s" }}>
-              Previous
-            </button>
-            <button disabled={!nextCursor} onClick={goNextPage}
-              style={{ padding: "7px 14px", borderRadius: "6px", background: !nextCursor ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", cursor: !nextCursor ? "not-allowed" : "pointer", opacity: !nextCursor ? 0.5 : 1, transition: "background 0.2s" }}>
-              Next
-            </button>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "14px 20px",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            background: "rgba(255,255,255,0.012)"
+          }}>
+            {/* Page info */}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "12px",
+              color: "var(--text-muted)"
+            }}>
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "22px",
+                height: "22px",
+                borderRadius: "6px",
+                background: "rgba(126,184,247,0.1)",
+                border: "1px solid rgba(126,184,247,0.2)",
+                color: "#7eb8f7",
+                fontSize: "11px",
+                fontWeight: 700,
+                fontFamily: "var(--mono)"
+              }}>
+                {currentPage + 1}
+              </span>
+              <span>of</span>
+              <span style={{ color: "var(--text-secondary)", fontWeight: 500 }}>
+                {Math.ceil(totalCount / limit) || 1} pages
+              </span>
+              <span style={{
+                width: "1px", height: "14px",
+                background: "rgba(255,255,255,0.08)",
+                margin: "0 4px"
+              }} />
+              <span style={{ fontFamily: "var(--mono)", color: "var(--text-muted)", fontSize: "11.5px" }}>
+                {totalCount} total sessions
+              </span>
+            </div>
+
+            {/* Controls */}
+            <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+              <button
+                className="ipsl-pag-btn"
+                disabled={currentPage === 0}
+                onClick={goPrevPage}
+                title="Previous page"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                  style={{ width: "14px", height: "14px" }}>
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+                <span>Prev</span>
+              </button>
+
+              {/* Dot track */}
+              <div style={{ display: "flex", gap: "4px", alignItems: "center", padding: "0 4px" }}>
+                {Array.from({ length: Math.min(5, Math.ceil(totalCount / limit) || 1) }, (_, i) => {
+                  const totalPages = Math.ceil(totalCount / limit) || 1;
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i;
+                  } else if (currentPage <= 2) {
+                    pageNum = i;
+                  } else if (currentPage >= totalPages - 3) {
+                    pageNum = totalPages - 5 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  const isActive = pageNum === currentPage;
+                  return (
+                    <div
+                      key={pageNum}
+                      style={{
+                        width: isActive ? "22px" : "7px",
+                        height: "7px",
+                        borderRadius: "99px",
+                        background: isActive
+                          ? "#7eb8f7"
+                          : pageNum < currentPage
+                            ? "rgba(126,184,247,0.3)"
+                            : "rgba(255,255,255,0.1)",
+                        transition: "all 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+                        boxShadow: isActive ? "0 0 8px rgba(126,184,247,0.5)" : "none"
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <button
+                className="ipsl-pag-btn ipsl-pag-btn-next"
+                disabled={!nextCursor}
+                onClick={goNextPage}
+                title="Next page"
+              >
+                <span>Next</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                  style={{ width: "14px", height: "14px" }}>
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -590,8 +722,9 @@ export default function InProgressDashboard() {
         <ScriptConfirmModal
           session={scriptSession}
           onConfirm={pushScript}
-          onClose={() => setScriptSession(null)}
+          onClose={() => { setScriptSession(null); setScriptPreviewData(null); }}
           pushing={scriptPushing}
+          previewData={scriptPreviewData}
         />
       )}
 

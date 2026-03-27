@@ -1,4 +1,4 @@
-const { ObjectId } = require("mongodb");
+const { ObjectId } = require("mongodb"); // ✅ already at top, good
 
 class InProgressService {
   constructor(db) {
@@ -8,46 +8,50 @@ class InProgressService {
   async getSessions({ partyId, status, cursor, limit = 10 }) {
 
     const query = {};
-
     if (partyId) query.partyId = partyId;
     if (status) query.status = status;
 
-    // Filter out 'completed' sessions older than 10 minutes
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
-    // We want: (status != 'completed') OR (status == 'completed' AND bookingEndTime >= tenMinutesAgo)
     const visibilityFilter = {
       $or: [
         { status: { $ne: "completed" } },
-        {
-          status: "completed",
-          bookingEndTime: { $gte: tenMinutesAgo }
-        }
+        { status: "completed", bookingEndTime: { $gte: tenMinutesAgo } }
       ]
     };
 
-    // Combine with existing filters
     const finalQuery = { $and: [query, visibilityFilter] };
 
+    // ✅ Cursor goes inside $and to avoid collision with top-level keys
     if (cursor) {
-      finalQuery._id = { $lt: new ObjectId(cursor) };
+      finalQuery.$and.push({ _id: { $lt: new ObjectId(cursor) } });
     }
 
     const parsedLimit = parseInt(limit) || 10;
 
-    const data = await this.collection
+    // ✅ Fetch one extra to detect if next page exists
+    const docs = await this.collection
       .find(finalQuery)
       .sort({ _id: -1 })
-      .limit(parsedLimit)
+      .limit(parsedLimit + 1)
       .toArray();
 
-    const nextCursor = data.length > 0 ? data[data.length - 1]._id.toString() : null;
+    const hasMore = docs.length > parsedLimit;
+    const pageDocs = hasMore ? docs.slice(0, parsedLimit) : docs;
 
-    return { data, total: 0, nextCursor };
+    // ✅ Only set nextCursor when there are actually more results
+    const nextCursor = hasMore
+      ? pageDocs[pageDocs.length - 1]._id.toString()
+      : null;
+
+    // ✅ Real total — uses same visibility filter but no cursor filter
+    const totalQuery = { $and: [query, visibilityFilter] };
+    const total = await this.collection.countDocuments(totalQuery);
+
+    return { data: pageDocs, total, nextCursor };
   }
 
   async getSummary() {
-
     const result = await this.collection.aggregate([
       {
         $group: {

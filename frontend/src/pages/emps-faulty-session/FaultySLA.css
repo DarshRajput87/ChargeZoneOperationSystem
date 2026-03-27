@@ -1118,6 +1118,56 @@
     }
 }
 
+/* ── Pagination ─────────────────────────────────────────────── */
+.fsla-pag-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease,
+        color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+}
+
+.fsla-pag-btn:hover:not(:disabled) {
+    background: rgba(126, 184, 247, 0.1);
+    border-color: rgba(126, 184, 247, 0.3);
+    color: #7eb8f7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(126, 184, 247, 0.12);
+}
+
+.fsla-pag-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.fsla-pag-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.fsla-pag-btn-next:not(:disabled) {
+    background: rgba(126, 184, 247, 0.07);
+    border-color: rgba(126, 184, 247, 0.2);
+    color: #7eb8f7;
+}
+
+.fsla-pag-btn-next:not(:disabled):hover {
+    background: rgba(126, 184, 247, 0.15);
+    border-color: rgba(126, 184, 247, 0.4);
+    box-shadow: 0 4px 16px rgba(126, 184, 247, 0.18);
+}
+
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════════ */

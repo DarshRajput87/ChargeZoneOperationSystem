@@ -236,6 +236,7 @@ export default function FaultyDashboard() {
     const [cursorHistory, setCursorHistory] = useState([null]);
     const [currentPage, setCurrentPage] = useState(0);
     const [nextCursor, setNextCursor] = useState(null);
+    const [totalCount, setTotalCount] = useState(0); // real total from DB
 
     useEffect(() => {
         const currentCursor = cursorHistory[currentPage];
@@ -250,6 +251,7 @@ export default function FaultyDashboard() {
             const res = await axios.get(BASE_URL, { params: { cursor, limit } });
             setSessions(res.data.data);
             setNextCursor(res.data.nextCursor);
+            setTotalCount(res.data.total || 0);
             setLastUpdated(new Date());
         } catch (e) {
             console.error(e);
@@ -383,8 +385,8 @@ export default function FaultyDashboard() {
     const warning = sessions.filter(s => { const h = calculateSLA(s.mailSentTime).hours; return h >= 24 && h < 48; }).length;
     const safe = sessions.filter(s => calculateSLA(s.mailSentTime).hours < 24).length;
 
-    // Only show pagination controls when there are 10 or more rows on this page
-    const showPagination = sessions.length >= 10;
+    // Only show pagination controls when we're not on the first page or there's more data to fetch
+    const showPagination = currentPage > 0 || (!!nextCursor && sessions.length === limit);
 
     return (
         <div className="fsla-page">
@@ -426,7 +428,7 @@ export default function FaultyDashboard() {
                     </div>
                     <div className="fsla-stat-divider" />
                     <div className="fsla-stat-pill total">
-                        <span className="fsla-stat-num">{sessions.length}</span>
+                        <span className="fsla-stat-num">{totalCount}</span>
                         <span className="fsla-stat-label">Total</span>
                     </div>
                 </div>
@@ -624,22 +626,117 @@ export default function FaultyDashboard() {
                 )}
 
                 {/* Pagination — only rendered when the current page has 10 rows */}
+                {/* Pagination */}
                 {showPagination && (
-                    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "16px", paddingBottom: "10px" }}>
-                        <button
-                            disabled={currentPage === 0}
-                            onClick={goPrevPage}
-                            style={{ padding: "7px 14px", borderRadius: "6px", background: currentPage === 0 ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", cursor: currentPage === 0 ? "not-allowed" : "pointer", opacity: currentPage === 0 ? 0.5 : 1, transition: "background 0.2s" }}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            disabled={!nextCursor}
-                            onClick={goNextPage}
-                            style={{ padding: "7px 14px", borderRadius: "6px", background: !nextCursor ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", cursor: !nextCursor ? "not-allowed" : "pointer", opacity: !nextCursor ? 0.5 : 1, transition: "background 0.2s" }}
-                        >
-                            Next
-                        </button>
+                    <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "14px 20px",
+                        borderTop: "1px solid rgba(255,255,255,0.06)",
+                        background: "rgba(255,255,255,0.012)"
+                    }}>
+                        {/* Page info */}
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            fontSize: "12px",
+                            color: "var(--text-muted)"
+                        }}>
+                            <span style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "22px",
+                                height: "22px",
+                                borderRadius: "6px",
+                                background: "rgba(126,184,247,0.1)",
+                                border: "1px solid rgba(126,184,247,0.2)",
+                                color: "#7eb8f7",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                fontFamily: "var(--mono)"
+                            }}>
+                                {currentPage + 1}
+                            </span>
+                            <span>of</span>
+                            <span style={{ color: "var(--text-secondary)", fontWeight: 500 }}>
+                                {Math.ceil(totalCount / limit)} pages
+                            </span>
+                            <span style={{
+                                width: "1px", height: "14px",
+                                background: "rgba(255,255,255,0.08)",
+                                margin: "0 4px"
+                            }} />
+                            <span style={{ fontFamily: "var(--mono)", color: "var(--text-muted)", fontSize: "11.5px" }}>
+                                {totalCount} total sessions
+                            </span>
+                        </div>
+
+                        {/* Controls */}
+                        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                            <button
+                                className="fsla-pag-btn"
+                                disabled={currentPage === 0}
+                                onClick={goPrevPage}
+                                title="Previous page"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                                    style={{ width: "14px", height: "14px" }}>
+                                    <path d="M15 18l-6-6 6-6" />
+                                </svg>
+                                <span>Prev</span>
+                            </button>
+
+                            {/* Page dots */}
+                            <div style={{ display: "flex", gap: "4px", alignItems: "center", padding: "0 4px" }}>
+                                {Array.from({ length: Math.min(5, Math.ceil(totalCount / limit)) }, (_, i) => {
+                                    const totalPages = Math.ceil(totalCount / limit);
+                                    let pageNum;
+                                    if (totalPages <= 5) {
+                                        pageNum = i;
+                                    } else if (currentPage <= 2) {
+                                        pageNum = i;
+                                    } else if (currentPage >= totalPages - 3) {
+                                        pageNum = totalPages - 5 + i;
+                                    } else {
+                                        pageNum = currentPage - 2 + i;
+                                    }
+                                    const isActive = pageNum === currentPage;
+                                    return (
+                                        <div
+                                            key={pageNum}
+                                            style={{
+                                                width: isActive ? "22px" : "7px",
+                                                height: "7px",
+                                                borderRadius: "99px",
+                                                background: isActive
+                                                    ? "#7eb8f7"
+                                                    : pageNum < currentPage
+                                                        ? "rgba(126,184,247,0.3)"
+                                                        : "rgba(255,255,255,0.1)",
+                                                transition: "all 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+                                                boxShadow: isActive ? "0 0 8px rgba(126,184,247,0.5)" : "none"
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </div>
+
+                            <button
+                                className="fsla-pag-btn fsla-pag-btn-next"
+                                disabled={!nextCursor}
+                                onClick={goNextPage}
+                                title="Next page"
+                            >
+                                <span>Next</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                                    style={{ width: "14px", height: "14px" }}>
+                                    <path d="M9 18l6-6-6-6" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
