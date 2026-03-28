@@ -16,6 +16,10 @@ import FleetForm from "../pages/fleet/FleetForm";
 import FaultyAnalysis from "../pages/emsp-faulty-sesssion-analysis/FaultyAnalysis";
 import ChargerSimulator from "../pages/ChargerSimulator/ChargerSimulator";
 import OCPIAnalysis from "../pages/OCPI-Analysis/OCPI-Analysis";
+import UserReview from "../pages/Helpdesk/HelpdeskPage";
+import ClosedTickets from "../pages/Helpdesk/ClosedTickets";
+import ReviewAnalysis from "../pages/Helpdesk/ReviewAnalysis";
+import CustomerManagement from "../pages/Customer Management/CustomerManagement";
 
 const AppRoutes = () => {
   return (
@@ -114,10 +118,55 @@ const AppRoutes = () => {
         />
 
         <Route
+          path="/user-review/pending-tickets"
+          element={
+            <DashboardLayout>
+              <UserReview />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/user-review/closed-tickets"
+          element={
+            <DashboardLayout>
+              <ClosedTickets />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/user-review/review-analysis"
+          element={
+            <DashboardLayout>
+              <ReviewAnalysis />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
           path="/analysis"
           element={
             <DashboardLayout>
               <OCPIAnalysis />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/customer-management"
+          element={
+            <DashboardLayout>
+              <CustomerManagement />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/customer-management/:userId"
+          element={
+            <DashboardLayout>
+              <CustomerManagement />
             </DashboardLayout>
           }
         />

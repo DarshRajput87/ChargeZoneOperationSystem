@@ -1,0 +1,595 @@
+/* ============================================================
+   HELPDESK — Design System Variables
+   ============================================================ */
+:root {
+    --bg: #080f1a;
+    --surface: #0c1525;
+    --card: #101e30;
+    --card-hover: #13233a;
+
+    --accent: #e8303a;
+    --accent-bg: rgba(232, 48, 58, 0.10);
+    --accent-glow: rgba(232, 48, 58, 0.22);
+
+    --text: #e2ecf7;
+    --muted: #5e7a94;
+    --muted-md: #8ba0b8;
+
+    --border: rgba(255, 255, 255, 0.07);
+    --border-md: rgba(255, 255, 255, 0.11);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-pill: 999px;
+
+    --font-main: 'DM Sans', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+.helpdesk-page {
+    min-height: 100vh;
+    background: var(--bg);
+    padding: 40px 48px;
+    font-family: var(--font-main);
+    color: var(--text);
+}
+
+.helpdesk-page h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: var(--text);
+    margin: 0 0 28px 0;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.helpdesk-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: visible;
+    table-layout: fixed;
+    /* Added back for colgroup to work properly */
+}
+
+.helpdesk-table thead tr {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-md);
+}
+
+/* Column configuration is now handled primarily by <colgroup> in JSX */
+.helpdesk-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border-md);
+}
+
+.helpdesk-table .col-action {
+    text-align: center;
+}
+
+.helpdesk-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s ease;
+}
+
+.helpdesk-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.helpdesk-table tbody tr:hover {
+    background: var(--card-hover);
+}
+
+.helpdesk-table tbody td {
+    padding: 14px 16px;
+    /* Slightly more vertical padding for breathing room */
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+    word-break: break-word;
+    /* Allow content to wrap within fixed columns */
+}
+
+/* Tags column — constrained so it doesn't stretch */
+.helpdesk-table tbody td.tags-col {
+    overflow: visible;
+    position: relative;
+}
+
+.helpdesk-table tbody tr {
+    overflow: visible;
+}
+
+/* Action column — centered */
+.helpdesk-table tbody td.action-col {
+    text-align: center;
+}
+
+/* ============================================================
+   CLOSE BUTTON
+   ============================================================ */
+.close-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 5px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.close-btn:hover {
+    background: #f03d47;
+    box-shadow: 0 0 12px var(--accent-glow);
+    transform: translateY(-1px);
+}
+
+.close-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================================
+   ATTENDED INPUT
+   ============================================================ */
+.attended-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.attended-input span {
+    font-size: 13.5px;
+    color: var(--text);
+}
+
+.attended-input input {
+    background: var(--card);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 12.5px;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: var(--font-main);
+    width: 110px;
+}
+
+.attended-input input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.attended-input button {
+    background: var(--card);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    color: var(--muted-md);
+    font-size: 13px;
+    padding: 5px 9px;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.attended-input button:hover {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* ============================================================
+   TAG SELECTOR  — wrapper
+   ============================================================ */
+.tag-selector-wrapper {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 180px;
+    max-width: 420px;
+}
+
+/* ============================================================
+   TAG INPUT BOX  — the combined chips + text field container
+   ============================================================ */
+.tag-input-box {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    /* background: var(--card); */
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+    cursor: text;
+    min-height: 36px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.tag-input-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* ============================================================
+   TAG CHIP  — selected tag inside the input box
+   ============================================================ */
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-bg);
+    border: 1px solid rgba(232, 48, 58, 0.28);
+    color: #f08a8e;
+    border-radius: var(--radius-pill);
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 3px 9px 3px 10px;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.tag-chip-remove {
+    background: none;
+    border: none;
+    color: #f08a8e;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+    transition: opacity 0.12s;
+    display: flex;
+    align-items: center;
+}
+
+.tag-chip-remove:hover {
+    opacity: 1;
+}
+
+/* ============================================================
+   TAG SEARCH INPUT  — the actual <input> inside the box
+   ============================================================ */
+.tag-search-input {
+    flex: 1 1 60px;
+    min-width: 60px;
+    max-width: 160px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-main);
+    padding: 2px 0;
+    caret-color: var(--accent);
+}
+
+.tag-search-input::placeholder {
+    color: var(--muted);
+}
+
+/* ============================================================
+   TAG DROPDOWN  — suggestion list
+   ============================================================ */
+.tag-dropdown {
+    background: var(--card);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+    animation: dropdownIn 0.12s ease;
+    min-width: 180px;
+}
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   TAG DROPDOWN ITEM  — individual option row
+   ============================================================ */
+.tag-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--muted-md);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    border-bottom: 1px solid var(--border);
+}
+
+.tag-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.tag-dropdown-item:hover {
+    background: var(--card-hover);
+    color: var(--text);
+}
+
+/* ============================================================
+   TAG DROPDOWN ADD  — "Add new tag" row
+   ============================================================ */
+.tag-dropdown-add {
+    color: var(--accent);
+    background: var(--accent-bg);
+    font-weight: 500;
+}
+
+.tag-dropdown-add:hover {
+    background: rgba(232, 48, 58, 0.16);
+    color: var(--accent);
+}
+
+.tag-add-icon {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ============================================================
+   TAG DROPDOWN EMPTY  — no results state
+   ============================================================ */
+.tag-dropdown-empty {
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--muted);
+    text-align: center;
+}
+
+/* ============================================================
+   TAG ADD BUTTON  — replaces inline input
+   ============================================================ */
+.tag-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed var(--border-md);
+    border-radius: var(--radius-pill);
+    color: var(--muted-md);
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 4px 12px 4px 8px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: var(--font-main);
+    white-space: nowrap;
+}
+
+.tag-add-btn:hover {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.tag-add-btn svg {
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   TAG DROPDOWN SEARCH  — search input inside dropdown
+   ============================================================ */
+.tag-dropdown-search {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-md);
+}
+
+.tag-dropdown-search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 12.5px;
+    font-family: var(--font-main);
+    padding: 7px 10px;
+    outline: none;
+    box-sizing: border-box;
+    caret-color: var(--accent);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.tag-dropdown-search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.tag-dropdown-search-input::placeholder {
+    color: var(--muted);
+}
+
+/* ============================================================
+   COMMENT COLUMN
+   ============================================================ */
+.helpdesk-table tbody td.comment-col {
+    overflow: visible;
+}
+
+/* ============================================================
+   COMMENT SECTION  — toggle + textarea
+   ============================================================ */
+.comment-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Toggle switch */
+.comment-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.comment-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.comment-toggle-slider {
+    position: relative;
+    width: 28px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-pill);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.comment-toggle-slider::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 10px;
+    height: 10px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.comment-toggle input:checked+.comment-toggle-slider {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+}
+
+.comment-toggle input:checked+.comment-toggle-slider::after {
+    left: 14px;
+    background: var(--accent);
+}
+
+.comment-toggle-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--muted-md);
+    white-space: nowrap;
+}
+
+.comment-toggle input:checked~.comment-toggle-label {
+    color: var(--accent);
+}
+
+/* Textarea */
+.comment-textarea {
+    background: var(--card);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 11.5px;
+    font-family: var(--font-main);
+    padding: 6px 8px;
+    resize: none;
+    min-height: 32px;
+    max-height: 80px;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    caret-color: var(--accent);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    animation: commentSlideIn 0.18s ease;
+    line-height: 1.4;
+}
+
+.comment-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.comment-textarea::placeholder {
+    color: var(--muted);
+}
+
+@keyframes commentSlideIn {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        max-height: 120px;
+        transform: translateY(0);
+    }
+}
+
+/* Read-only comment in closed tickets */
+.comment-readonly {
+    font-size: 13px;
+    color: var(--muted-md);
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* ============================================================
+   CELL ALIGNMENT & ELEMENTS
+   ============================================================ */
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-name {
+    font-weight: 500;
+}
+
+.history-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 10px;
+    padding: 3px 8px;
+    color: var(--muted-md);
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.history-btn:hover {
+    background: var(--card-hover);
+    border-color: var(--muted);
+    color: var(--text);
+}
+
+.attended-readonly {
+    font-size: 13px;
+    color: var(--text);
+}

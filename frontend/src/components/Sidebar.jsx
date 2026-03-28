@@ -31,6 +31,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         <NavLink to="/dashboard" onClick={onClose}>Dashboard</NavLink>
         <NavLink to="/station-explorer" onClick={onClose}>Station Explorer</NavLink>
         <NavLink to="/fleet" onClick={onClose}>Fleet</NavLink>
+        <NavLink to="/customer-management" onClick={onClose}>Customer Management</NavLink>
         <NavLink to="/simulator" onClick={onClose}>Charger Simulator</NavLink>
 
         {/* EMSP MODULE */}
@@ -152,8 +153,33 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         </div>
 
+        {/* USER REVIEW MODULE */}
+        <div className="menu-module">
+
+          <div
+            className="module-title"
+            onClick={() => toggleModule("user-review")}
+          >
+            User Review
+          </div>
+
+          {openModule === "user-review" && (
+            <div className="submenu">
+              <NavLink to="/user-review/pending-tickets" className="submenu-item" onClick={onClose}>
+                Pending Tickets
+              </NavLink>
+              <NavLink to="/user-review/closed-tickets" className="submenu-item" onClick={onClose}>
+                Closed Tickets
+              </NavLink>
+              <NavLink to="/user-review/review-analysis" className="submenu-item" onClick={onClose}>
+                Review Analysis
+              </NavLink>
+            </div>
+          )}
+
+        </div>
+
         {/* Other Modules */}
-        <NavLink to="/reports" onClick={onClose}>User Review Reports</NavLink>
         <NavLink to="/analysis" onClick={onClose}>OCPI Analysis</NavLink>
         <NavLink to="/settings" onClick={onClose}>Settings</NavLink>
 

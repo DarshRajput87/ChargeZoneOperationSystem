@@ -14,28 +14,15 @@ const fleetRoutes = require("./modules/fleet-management/fleet.routes");
 const faultyAnalysisRoutes = require("./modules/faulty-analysis/faultyAnalysis.routes");
 const simulatorRoutes = require("./modules/Charger Simulator/simulator.routes");
 const ocpiAnalyticsRoutes = require("./modules/ocpiAnalytics/ocpiAnalytics.routes");
-const feedbackRoutes = require("./modules/feedback/feedback.routes");
+const helpdeskRoutes = require("./modules/helpdesk/helpdesk.routes");
+const customerRoutes = require("./modules/customer-management/customer.routes");
+const reviewAnalysisRoutes = require("./modules/review-analysis/reviewAnalysis.routes");
+
 
 const app = express();
 
-// =====================================================
-// 🌐 ENABLE CORS FOR ALL ORIGINS
-// =====================================================
-
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-// Handle preflight requests
-app.options("{*path}", cors());
-
+app.use(cors());
 app.use(express.json());
-
-// =====================================================
-// 🚀 ROUTES
-// =====================================================
 
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
@@ -50,6 +37,9 @@ app.use("/api/fleet", fleetRoutes);
 app.use("/api/faulty-analysis", faultyAnalysisRoutes);
 app.use("/api/simulator", simulatorRoutes);
 app.use("/api/ocpi-analytics", ocpiAnalyticsRoutes);
-app.use("/feedback", feedbackRoutes);
+app.use("/api/helpdesk", helpdeskRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/review-analysis", reviewAnalysisRoutes);
+
 
 module.exports = app;
