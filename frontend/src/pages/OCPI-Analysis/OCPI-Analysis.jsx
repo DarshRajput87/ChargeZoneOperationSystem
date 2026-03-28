@@ -51,6 +51,7 @@ const OCPIAnalysis = () => {
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [viewingMessage, setViewingMessage] = useState(null);
 
     const [filters, setFilters] = useState({
         date: getLocalYMD(),
@@ -405,11 +406,21 @@ const OCPIAnalysis = () => {
                                                     <div className="status-cell">
                                                         <span className={`status-badge ${cls}`}>{sc}</span>
                                                         {log.status_message && (
-                                                            <span className="status-message">
-                                                                {log.status_message.length > 40
-                                                                    ? log.status_message.substring(0, 40) + "…"
-                                                                    : log.status_message}
-                                                            </span>
+                                                            <>
+                                                                <span className="status-message">
+                                                                    {log.status_message}
+                                                                </span>
+                                                                <button
+                                                                    className="view-msg-btn"
+                                                                    title="View full message"
+                                                                    onClick={() => setViewingMessage(log.status_message)}
+                                                                >
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                                        <circle cx="12" cy="12" r="3" />
+                                                                    </svg>
+                                                                </button>
+                                                            </>
                                                         )}
                                                     </div>
                                                 </td>
@@ -434,6 +445,21 @@ const OCPIAnalysis = () => {
                     )}
                 </section>
             </div>
+
+            {/* ── Full Message Modal ── */}
+            {viewingMessage && (
+                <div className="msg-modal-overlay" onClick={() => setViewingMessage(null)}>
+                    <div className="msg-modal" onClick={e => e.stopPropagation()}>
+                        <div className="msg-modal-header">
+                            <span className="msg-modal-title">Status Message</span>
+                            <button className="msg-modal-close" onClick={() => setViewingMessage(null)}>✕</button>
+                        </div>
+                        <div className="msg-modal-body">
+                            {viewingMessage}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
