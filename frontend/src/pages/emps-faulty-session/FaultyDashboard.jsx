@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import EVLoader from "../Dashboard/EVLoader";
 import "./FaultySLA.css";
 
-const BASE_URL = "https://api.chargezoneops.online/api/emsp-faulty-sessions";
+const BASE_URL = "/emsp-faulty-sessions";
 const FAULTY_PREVIEW = `${BASE_URL}/preview`;
 const FAULTY_PUSH = `${BASE_URL}/push`;
 
@@ -248,7 +248,7 @@ export default function FaultyDashboard() {
     const fetchData = async (cursor) => {
         setLoading(true);
         try {
-            const res = await axios.get(BASE_URL, { params: { cursor, limit } });
+            const res = await API.get(BASE_URL, { params: { cursor, limit } });
             setSessions(res.data.data);
             setNextCursor(res.data.nextCursor);
             setTotalCount(res.data.total || 0);
@@ -305,7 +305,7 @@ export default function FaultyDashboard() {
         if (method === "cdr") {
             setPreviewLoading(true);
             try {
-                const res = await axios.get(`${SETTLEMENT_PREVIEW}/${bookings[0]}`);
+                const res = await API.get(`${SETTLEMENT_PREVIEW}/${bookings[0]}`);
                 if (!res.data.success) { alert(res.data.error); return; }
                 setPayload(res.data.payload);
                 setToken(res.data.token);
@@ -320,7 +320,7 @@ export default function FaultyDashboard() {
         } else {
             setPreviewLoading(true);
             try {
-                const res = await axios.post(FAULTY_PREVIEW, { bookingIds: bookings });
+                const res = await API.post(FAULTY_PREVIEW, { bookingIds: bookings });
                 if (!res.data.success) { alert(res.data.error); return; }
 
                 setFaultyPreviews(res.data.previews);
@@ -350,11 +350,11 @@ export default function FaultyDashboard() {
         setPushing(true);
         try {
             if (settleMethod === "cdr") {
-                const res = await axios.post(SETTLEMENT_PUSH, { payload, token });
+                const res = await API.post(SETTLEMENT_PUSH, { payload, token });
                 if (res.data.success) { alert("CDR pushed successfully"); fetchData(); }
                 else alert("Push failed");
             } else {
-                const res = await axios.post(FAULTY_PUSH, { bookingIds: settleBookings });
+                const res = await API.post(FAULTY_PUSH, { bookingIds: settleBookings });
                 if (res.data.success) {
                     alert("Faulty sessions pushed successfully");
                     fetchData();

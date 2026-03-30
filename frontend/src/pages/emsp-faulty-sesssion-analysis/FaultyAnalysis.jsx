@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import API from "../../services/api";
 import "./FaultyAnalysis.css";
 
 import {
@@ -66,9 +67,8 @@ export default function FaultyAnalysis() {
     const [panelOpen, setPanelOpen] = useState(false);
 
     useEffect(() => {
-        fetch("https://api.chargezoneops.online/api/faulty-analysis/recent")
-            .then(r => r.json())
-            .then(data => setRecent(data))
+        API.get("/faulty-analysis/recent")
+            .then(res => setRecent(res.data))
             .catch(() => { });
     }, []);
 

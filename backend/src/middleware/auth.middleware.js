@@ -18,4 +18,13 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = protect;
+const blockViewerChanges = (req, res, next) => {
+  if (req.user && req.user.role === "VIEWER") {
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+      return res.status(403).json({ message: "Forbidden: Viewer accounts cannot modify data" });
+    }
+  }
+  next();
+};
+
+module.exports = { protect, blockViewerChanges };

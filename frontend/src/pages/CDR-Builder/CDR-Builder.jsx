@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import API from "../../services/api";
 import "./CDRBuilder.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -55,13 +56,13 @@ export default function CDRBuilder() {
     if (!bookingId.trim()) { alert("Enter Booking ID"); return; }
     setLoading(true); setError(""); setBookingStatus(""); setPayload(null); setIsEditing(false);
     try {
-      const res = await fetch(`${BUILD_URL}/${bookingId}`);
-      const data = await res.json();
-      if (!res.ok || !data.success) { setError(data.error || "Session not found"); setLoading(false); return; }
+      const res = await API.get(`/cdr-recovery/build/${bookingId}`);
+      const data = res.data;
+      if (!data.success) { setError(data.error || "Session not found"); setLoading(false); return; }
       setBookingStatus(data.bookingStatus);
       setPayload(data.payload);
       setToken(data.token);
-    } catch { setError("Backend not reachable"); }
+    } catch (err) { setError(err.response?.data?.error || "Backend not reachable"); }
     setLoading(false);
   };
 

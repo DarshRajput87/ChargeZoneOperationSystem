@@ -19,12 +19,21 @@ const customerRoutes = require("./modules/customer-management/customer.routes");
 const reviewAnalysisRoutes = require("./modules/review-analysis/reviewAnalysis.routes");
 
 
+const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// Public routes
 app.use("/api/auth", authRoutes);
+
+// Global authentication and authorization middleware
+app.use(protect);
+app.use(blockViewerChanges);
+
+// Protected routes
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/station-explorer", stationExplorerRoutes);
 app.use("/api/station-explorer/chargers", chargerRoutes);

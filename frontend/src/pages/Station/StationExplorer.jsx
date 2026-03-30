@@ -1,8 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import "./stationExplorer.css";
-
-const BASE_URL = "https://api.chargezoneops.online/api/station-explorer";
 
 /* ─── All Indian States & UTs ─── */
 const INDIA_STATES = [
@@ -108,7 +106,7 @@ const StationExplorer = () => {
       if (statusFilter) params.status = statusFilter;
       if (stateFilter) params.state = stateFilter;
       if (externalFilter !== "") params.isExternal = externalFilter; // ← NEW
-      const res = await axios.get(BASE_URL, { params });
+      const res = await API.get("/station-explorer", { params });
       setStations(res.data.data);
       setTotal(res.data.total);
     } catch (err) {
@@ -128,7 +126,7 @@ const StationExplorer = () => {
     if (!chargers[stationId]) {
       setLoadingChargers((p) => ({ ...p, [stationId]: true }));
       try {
-        const res = await axios.get(`${BASE_URL}/${stationId}/chargers`);
+        const res = await API.get(`/station-explorer/${stationId}/chargers`);
         setChargers((p) => ({ ...p, [stationId]: res.data }));
       } finally {
         setLoadingChargers((p) => ({ ...p, [stationId]: false }));

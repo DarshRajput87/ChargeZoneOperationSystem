@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import EVLoader from "./EVLoader.jsx";
 import "./InProgressSLA.css";
 
-const BASE_URL = "http://api.chargezoneops.online/api/emsp-in-progress";
-const SETTLEMENT_PREVIEW = "http://api.chargezoneops.online/api/settlement/preview";
-const SETTLEMENT_PUSH = "http://api.chargezoneops.online/api/settlement/push";
-const SCRIPT_PUSH = "http://api.chargezoneops.online/api/emsp-in-progress/script-push";
-const SCRIPT_PREVIEW = "http://api.chargezoneops.online/api/emsp-in-progress/script-preview";
+const BASE_URL = "/emsp-in-progress";
+const SETTLEMENT_PREVIEW = "/settlement/preview";
+const SETTLEMENT_PUSH = "/settlement/push";
+const SCRIPT_PUSH = "/emsp-in-progress/script-push";
+const SCRIPT_PREVIEW = "/emsp-in-progress/script-preview";
 
 
 /* ───────── Deep flatten ───────── */
@@ -327,7 +327,7 @@ export default function InProgressDashboard() {
   const fetchData = async (cursor) => {
     setLoading(true);
     try {
-      const res = await axios.get(BASE_URL, { params: { cursor, limit } });
+      const res = await API.get(BASE_URL, { params: { cursor, limit } });
       setSessions(res.data.data);
       setNextCursor(res.data.nextCursor);
       setTotalCount(res.data.total || 0);
@@ -374,7 +374,7 @@ export default function InProgressDashboard() {
 
     if (method === "script") {
       try {
-        const res = await axios.get(`${SCRIPT_PREVIEW}/${session.bookingId}`);
+        const res = await API.get(`${SCRIPT_PREVIEW}/${session.bookingId}`);
         if (!res.data.success) { alert(res.data.error || "Failed to fetch script preview"); return; }
         setScriptPreviewData(res.data);
         setScriptSession(session);
@@ -386,7 +386,7 @@ export default function InProgressDashboard() {
 
     // CDR Builder path — fetch preview payload then show settle modal
     try {
-      const res = await axios.get(`${SETTLEMENT_PREVIEW}/${session.bookingId}`);
+      const res = await API.get(`${SETTLEMENT_PREVIEW}/${session.bookingId}`);
       if (!res.data.success) { alert(res.data.error); return; }
       setPayload(res.data.payload);
       setToken(res.data.token);
@@ -401,7 +401,7 @@ export default function InProgressDashboard() {
     if (!payload) return;
     setPushing(true);
     try {
-      const res = await axios.post(SETTLEMENT_PUSH, { payload, token });
+      const res = await API.post(SETTLEMENT_PUSH, { payload, token });
       if (res.data.success) {
         alert("CDR pushed successfully");
         fetchData(cursorHistory[currentPage]);
@@ -421,7 +421,7 @@ export default function InProgressDashboard() {
     if (!scriptSession) return;
     setScriptPushing(true);
     try {
-      const res = await axios.post(SCRIPT_PUSH, {
+      const res = await API.post(SCRIPT_PUSH, {
         bookingIds: [scriptSession.bookingId]
       });
       if (res.data.success) {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import API from "../../services/api";
 import "./OCPIAnalysis.css";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -76,23 +77,17 @@ const OCPIAnalysis = () => {
             if (filters.status) query += `&status=${filters.status}`;
             if (filters.booking_type) query += `&booking_type=${filters.booking_type}`;
 
-            const base = "https://api.chargezoneops.online/api/ocpi-analytics";
+            const base = "/ocpi-analytics";
 
             const [logsRes, summaryRes, modulesRes] = await Promise.all([
-                fetch(`${base}/logs${query}`),
-                fetch(`${base}/summary${query}`),
-                fetch(`${base}/modules${query}`),
+                API.get(`${base}/logs${query}`),
+                API.get(`${base}/summary${query}`),
+                API.get(`${base}/modules${query}`),
             ]);
 
-            const [logsData, summaryData, modulesData] = await Promise.all([
-                logsRes.json(),
-                summaryRes.json(),
-                modulesRes.json(),
-            ]);
-
-            setLogs(logsData.data || []);
-            setSummary(summaryData.data?.[0] || null);
-            setModules(modulesData.data || []);
+            setLogs(logsRes.data.data || []);
+            setSummary(summaryRes.data.data?.[0] || null);
+            setModules(modulesRes.data.data || []);
         } catch (err) {
             console.error("Error fetching OCPI data:", err);
             setError("Unable to reach the OCPI API. Check that the server is running.");
@@ -102,14 +97,12 @@ const OCPIAnalysis = () => {
     }, [filters]);
 
     useEffect(() => {
-        fetch("https://api.chargezoneops.online/api/ocpi-analytics/all-parties")
-            .then(res => res.json())
-            .then(data => setParties(data.data || []))
+        API.get("/ocpi-analytics/all-parties")
+            .then(res => setParties(res.data.data || []))
             .catch(console.error);
 
-        fetch("https://api.chargezoneops.online/api/ocpi-analytics/tenants")
-            .then(res => res.json())
-            .then(data => setTenants(data.data || []))
+        API.get("/ocpi-analytics/tenants")
+            .then(res => setTenants(res.data.data || []))
             .catch(console.error);
     }, []);
 

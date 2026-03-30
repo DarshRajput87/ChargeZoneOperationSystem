@@ -1,33 +1,31 @@
-import axios from "axios";
-
-const API = "https://api.chargezoneops.online/api/simulator";
+import API from "../../services/api";
 
 export const connectCharger = (wsUrl) =>
-    axios.post(`${API}/connect`, { wsUrl });
+    API.post(`/simulator/connect`, { wsUrl });
 
 export const sendStatus = (status) =>
-    axios.post(`${API}/status`, { status });
+    API.post(`/simulator/status`, { status });
 
 export const startTransaction = () =>
-    axios.post(`${API}/start`);
+    API.post(`/simulator/start`);
 
 export const stopTransaction = () =>
-    axios.post(`${API}/stop`);
+    API.post(`/simulator/stop`);
 
 export const getLogs = () =>
-    axios.get(`${API}/logs`);
+    API.get(`/simulator/logs`);
 
 export const createFaultScenario = (data) =>
-    axios.post(`${API}/fault/create`, data);
+    API.post(`/simulator/fault/create`, data);
 
 export const getFaultScenarios = () =>
-    axios.get(`${API}/fault/list`);
+    API.get(`/simulator/fault/list`);
 
 export const sendFaultScenario = (id) =>
-    axios.post(`${API}/fault/send`, { id });
+    API.post(`/simulator/fault/send`, { id });
 
 export const sendMeterValues = (payload) =>
-    axios.post(`${API}/meter/values`, payload);
+    API.post(`/simulator/meter/values`, payload);
 
 export const clearLogs = () =>
-    axios.delete(`${API}/logs`);
+    API.delete(`/simulator/logs`);

@@ -1,15 +1,13 @@
-import axios from "axios";
-
-const BASE_URL = "https://api.chargezoneops.online/api/station-explorer";
+import API from "./api";
 
 export const fetchStations = async (search = "", page = 1, limit = 10) => {
-  const res = await axios.get(BASE_URL, {
+  const res = await API.get("/station-explorer", {
     params: { search, page, limit },
   });
   return res.data;
 };
 
 export const fetchChargers = async (stationId) => {
-  const res = await axios.get(`${BASE_URL}/${stationId}/chargers`);
+  const res = await API.get(`/station-explorer/${stationId}/chargers`);
   return res.data;
-};
+};

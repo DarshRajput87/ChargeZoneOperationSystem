@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import "./InProgressAnalysis.css";
 
-const BASE_URL = "https://api.chargezoneops.online/api/emsp-in-progress-analysis";
+const BASE_URL = "/emsp-in-progress-analysis";
 const SPARK_DATA = [1, 2, 1, 3, 2, 3, 4, 3, 5, 3, 4, 3];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ export default function InProgressAnalysis() {
         try {
             setLoading(true);
             setError(null);
-            const res = await axios.get(BASE_URL);
+            const res = await API.get(BASE_URL);
             if (res.data?.success) {
                 setAnalysis(res.data.data);
                 setTs(new Date());

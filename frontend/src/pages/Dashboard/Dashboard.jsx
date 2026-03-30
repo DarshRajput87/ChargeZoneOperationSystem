@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import EVLoader from "./EVLoader.jsx";
@@ -53,12 +53,12 @@ const Dashboard = () => {
   const checkServer = useCallback(async () => {
     setServerStatus("checking");
     try {
-      await axios.get(`${BASE_URL}/health`, { timeout: 4000 });
+      await fetch(`${BASE_URL}/health`, { signal: AbortSignal.timeout(4000) });
       setServerStatus("online");
       return true;
     } catch {
       try {
-        await axios.get(`${BASE_URL}/api/dashboard/metrics`, { timeout: 4000 });
+        await API.get(`/dashboard/metrics`, { timeout: 4000 });
         setServerStatus("online");
         return true;
       } catch {
@@ -71,7 +71,7 @@ const Dashboard = () => {
   // Fetch dashboard metrics
   const fetchMetrics = useCallback(async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/dashboard/metrics`, { timeout: 8000 });
+      const res = await API.get(`/dashboard/metrics`, { timeout: 8000 });
       setMetrics(res.data.data);
       setLastUpdated(new Date());
       setServerStatus("online");

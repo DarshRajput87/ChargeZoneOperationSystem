@@ -1,41 +1,27 @@
-const BASE = "https://api.chargezoneops.online/api/helpdesk";
+import API from "./api";
 
 export const getHelpdeskUsers = async () => {
-    const res = await fetch(BASE);
-    return res.json();
+    const res = await API.get("/helpdesk");
+    return res.data;
 };
 
 export const getClosedHelpdeskUsers = async () => {
-    const res = await fetch(`${BASE}/closed`);
-    return res.json();
+    const res = await API.get("/helpdesk/closed");
+    return res.data;
 };
 
 export const updateAttendedBy = async (id, attendedBy) => {
-    return fetch(`${BASE}/${id}/attended`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ attendedBy })
-    });
+    return API.patch(`/helpdesk/${id}/attended`, { attendedBy });
 };
 
 export const updateTags = async (id, tags) => {
-    return fetch(`${BASE}/${id}/tags`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tags })
-    });
+    return API.patch(`/helpdesk/${id}/tags`, { tags });
 };
 
 export const closeTicket = async (id) => {
-    return fetch(`${BASE}/${id}/close`, {
-        method: "PATCH"
-    });
+    return API.patch(`/helpdesk/${id}/close`);
 };
 
 export const updateComment = async (id, comment) => {
-    return fetch(`${BASE}/${id}/comment`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment })
-    });
-};
+    return API.patch(`/helpdesk/${id}/comment`, { comment });
+};

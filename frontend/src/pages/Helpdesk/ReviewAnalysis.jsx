@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import API from "../../services/api";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from "recharts";
@@ -178,8 +179,7 @@ export default function ReviewAnalysis() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch("https://api.chargezoneops.online/api/review-analysis?HelpNeeded=yes")
-      .then(r => r.json())
+    API.get("/review-analysis?HelpNeeded=yes")
       .then(res => {
         const rows = (res.data || []).filter(i => i.rating <= 3);
         setData(rows);
