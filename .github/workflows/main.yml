@@ -1,1 +1,74 @@
+name: Deploy Backend
 
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (SSH + rsync)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y openssh-client rsync
+
+      - name: Setup SSH
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Set release variable
+        id: vars
+        run: echo "RELEASE=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Create release directory
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+          "mkdir -p ${{ secrets.PROJECT_PATH }}/releases/$RELEASE"
+
+      - name: Rsync files
+        run: |
+          rsync -az --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='logs' \
+            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.PROJECT_PATH }}/releases/$RELEASE
+
+      - name: Install & Start Backend
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            set -e
+            cd ${{ secrets.PROJECT_PATH }}/releases/$RELEASE/backend
+            npm ci --omit=dev
+            ln -sfn ${{ secrets.PROJECT_PATH }}/releases/$RELEASE ${{ secrets.PROJECT_PATH }}/current &&
+            ln -sfn ${{ secrets.PROJECT_PATH }}/shared/.env ${{ secrets.PROJECT_PATH }}/current/backend/.env &&
+            pm2 delete server || true
+            pm2 start ${{ secrets.PROJECT_PATH }}/current/backend/src/server.js --name server &&
+            pm2 save
+          "
+
+      - name: Cleanup old releases
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            cd ${{ secrets.PROJECT_PATH }}/releases
+            ls -dt */ | tail -n +4 | xargs -r rm -rf
+          "
+
+      - name: Disk safety cleanup
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//')
+            if [ \"\$USAGE\" -gt 85 ]; then
+              cd ${{ secrets.PROJECT_PATH }}/releases
+              ls -dt */ | tail -n +3 | xargs -r rm -rf
+            fi
+          "
