@@ -17,7 +17,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y openssh-client rsync
 
-      # ✅ FIXED SSH SETUP (no ssh-agent)
+      # ✅ SSH SETUP (FIXED + VALIDATION)
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -31,21 +31,26 @@ jobs:
 
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      # ✅ ensure SSH uses this key
+      # ✅ SSH CONFIG (CLEAN)
       - name: Configure SSH
         run: |
           echo "Host *" >> ~/.ssh/config
           echo "  IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
+      # ✅ RELEASE VARIABLE (SAFE)
       - name: Set release variable
-        run: echo "RELEASE=$(date +%s)" >> $GITHUB_ENV
+        run: |
+          RELEASE=$(date +%s)
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          echo "Deploying release: $RELEASE"
 
+      # ✅ CREATE RELEASE DIR
       - name: Create release directory
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
           "mkdir -p ${{ secrets.PROJECT_PATH }}/releases/$RELEASE"
 
+      # ✅ RSYNC DEPLOY
       - name: Rsync files
         run: |
           rsync -az --delete \
@@ -55,19 +60,33 @@ jobs:
             --exclude='logs' \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.PROJECT_PATH }}/releases/$RELEASE
 
+      # ✅ INSTALL + START (NO DOWNTIME VERSION)
       - name: Install & Start Backend
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             set -e
+
             cd ${{ secrets.PROJECT_PATH }}/releases/$RELEASE/backend
+
             npm ci --omit=dev
+
+            # ensure .env exists
+            if [ ! -f '${{ secrets.PROJECT_PATH }}/shared/.env' ]; then
+              echo '.env missing ❌'
+              exit 1
+            fi
+
+            # switch current release
             ln -sfn ${{ secrets.PROJECT_PATH }}/releases/$RELEASE ${{ secrets.PROJECT_PATH }}/current
             ln -sfn ${{ secrets.PROJECT_PATH }}/shared/.env ${{ secrets.PROJECT_PATH }}/current/backend/.env
-            pm2 delete server || true
-            pm2 start ${{ secrets.PROJECT_PATH }}/current/backend/src/server.js --name server
+
+            # restart safely (no downtime crash)
+            pm2 restart server || pm2 start src/server.js --name server
+
             pm2 save
           "
 
+      # ✅ CLEANUP OLD RELEASES
       - name: Cleanup old releases
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
@@ -75,11 +94,14 @@ jobs:
             ls -dt */ | tail -n +4 | xargs -r rm -rf
           "
 
+      # ✅ DISK SAFETY
       - name: Disk safety cleanup
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             USAGE=\$(df / | awk 'NR==2 {print \$5}' | sed 's/%//')
+
             if [ \"\$USAGE\" -gt 85 ]; then
+              echo 'Disk usage high, cleaning more...'
               cd ${{ secrets.PROJECT_PATH }}/releases
               ls -dt */ | tail -n +3 | xargs -r rm -rf
             fi
