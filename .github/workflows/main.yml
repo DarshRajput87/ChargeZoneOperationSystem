@@ -23,6 +23,12 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+            echo "EC2_HOST is empty ❌"
+            exit 1
+          fi
+
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       # ✅ ensure SSH uses this key
