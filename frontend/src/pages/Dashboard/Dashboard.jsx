@@ -5,7 +5,7 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import EVLoader from "./EVLoader.jsx";
 import "./dashboard.css";
 
-const BASE_URL = "http://13.232.112.152";
+const BASE_URL = "https://api.chargezoneops.online";
 const COLORS = ["#00d4aa", "#818cf8", "#fbbf24", "#e8303a", "#fb923c"];
 
 const formatNumber = (num) =>

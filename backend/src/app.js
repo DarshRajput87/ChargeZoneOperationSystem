@@ -23,16 +23,7 @@ const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
 
 const app = express();
 
-app.use(cors({
-    origin: [
-        "http://13.232.112.152",
-        "http://localhost:5173",
-        "http://localhost:3000"
-    ],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Public routes
