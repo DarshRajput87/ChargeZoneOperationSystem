@@ -24,4 +24,4 @@ export const closeTicket = async (id) => {
 
 export const updateComment = async (id, comment) => {
     return API.patch(`/helpdesk/${id}/comment`, { comment });
-};
+};
