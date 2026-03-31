@@ -17,6 +17,7 @@ const ocpiAnalyticsRoutes = require("./modules/ocpiAnalytics/ocpiAnalytics.route
 const helpdeskRoutes = require("./modules/helpdesk/helpdesk.routes");
 const customerRoutes = require("./modules/customer-management/customer.routes");
 const reviewAnalysisRoutes = require("./modules/review-analysis/reviewAnalysis.routes");
+const feedbackRoutes = require("./modules/feedback/feedback.routes");
 
 
 const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
@@ -28,6 +29,7 @@ app.use(express.json());
 
 // Public routes
 app.use("/api/auth", authRoutes);
+app.use("/feedback", feedbackRoutes);
 
 // Global authentication and authorization middleware
 app.use(protect);
