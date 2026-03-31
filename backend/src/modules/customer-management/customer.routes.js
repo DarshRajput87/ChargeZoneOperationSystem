@@ -9,4 +9,8 @@ router.get("/search", controller.searchUsers);
 // 👤 Full user detail
 router.get("/:userId", controller.getUserDetails);
 
+// 📊 User Segment
+router.get("/user-segment/:userId", controller.getUserSegment);
+
+
 module.exports = router;

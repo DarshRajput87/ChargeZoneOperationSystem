@@ -1,3 +1,5 @@
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+
 const icons = {
     phone: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -63,7 +65,27 @@ const icons = {
             <path d="M12 8v8" />
         </svg>
     ),
+    segment: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+    ),
+    clock: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+    ),
+    star: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+    )
 };
+
 
 export default function ProfileTab({ profile, vehicles }) {
     if (!profile) return null;
@@ -91,7 +113,7 @@ export default function ProfileTab({ profile, vehicles }) {
             value: (
                 <div>
                     <div style={{ fontWeight: 600 }}>
-                        {profile.chargeCoins?.available || 0} Coins
+                        {profile.chargeCoins?.available} Coins
                     </div>
                     <div style={{ fontSize: "12px", color: "#888" }}>
                         Total Earned: {profile.chargeCoins?.totalCount || 0}
@@ -99,7 +121,32 @@ export default function ProfileTab({ profile, vehicles }) {
                 </div>
             )
         },
+        {
+            icon: icons.segment,
+            label: "User Segment",
+            value: (
+                <span className={`cm-badge ${profile.segment === "churned" ? "cm-badge--red" : profile.segment === "active" ? "cm-badge--green" : "cm-badge--blue"}`}>
+                    {(profile.segment || "N/A").replace("_", " ").toUpperCase()}
+                </span>
+            )
+        },
+        {
+            icon: icons.clock,
+            label: "Last Booking",
+            value: profile.lastBooking ? new Date(profile.lastBooking).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"
+        },
+        {
+            icon: icons.star,
+            label: "Average Rating",
+            value: (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontWeight: 600, fontSize: "16px" }}>{profile.rating?.average || "0.0"}</span>
+                    <span style={{ fontSize: "12px", color: "#888" }}>({profile.rating?.count || 0} reviews)</span>
+                </div>
+            )
+        },
     ];
+
 
     return (
         <div className="cm-profile-tab">
@@ -150,6 +197,30 @@ export default function ProfileTab({ profile, vehicles }) {
                     </tbody>
                 </table>
             </div>
+
+            {/* ── Rating Chart ── */}
+            <h3 className="cm-section-title" style={{ marginTop: "32px" }}>Rating Distribution</h3>
+            <div className="cm-table-wrapper" style={{ padding: "20px", height: "300px", paddingBottom: "10px" }}>
+                {profile.rating?.count > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={profile.rating.distribution} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                            <XAxis dataKey="rating" tick={{ fill: '#94a3b8', fontSize: 12 }} stroke="#334155" />
+                            <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} stroke="#334155" allowDecimals={false} />
+                            <Tooltip
+                                cursor={{ fill: '#1e293b' }}
+                                contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px', border: '1px solid #334155', color: '#f8fafc', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+                                itemStyle={{ color: '#38bdf8' }}
+                            />
+                            <Bar dataKey="count" fill="#4f46e5" radius={[4, 4, 0, 0]} barSize={40} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
+                        No ratings available for this user yet.
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
+

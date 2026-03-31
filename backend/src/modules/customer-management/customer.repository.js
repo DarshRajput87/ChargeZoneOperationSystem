@@ -7,7 +7,7 @@ const getDb = () => global.cmsDb;
 exports.searchUsers = async (query) => {
     const db = getDb();
 
-    let filter = {};
+    let filter = { role: "customer" };
 
     if (mongoose.Types.ObjectId.isValid(query)) {
         filter._id = new mongoose.Types.ObjectId(query);
@@ -42,7 +42,7 @@ exports.getUser = async (userId) => {
                 total_session: 1,
                 total_spent: 1,
                 total_units_consumed: 1,
-                charge_coin: 1,
+                chargecoins_v2: 1,
                 createdAt: 1
             }
         }
@@ -318,3 +318,182 @@ exports.getBookings = async (userId, query) => {
 
     return { bookings, totalBookings };
 };
+
+// 📊 USER SEGMENT
+exports.getUserSegment = async (userId) => {
+    const db = getDb();
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error("Invalid userId");
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId)
+        }
+      },
+      {
+        $lookup: {
+          from: "chargerbookings",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$customer_user_booked", "$$userId"] },
+                    { $eq: ["$status", "completed"] },
+                    { $eq: ["$payment_status", "done"] }
+                  ]
+                }
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                last_booking: { $max: "$updatedAt" },
+                total_bookings: { $sum: 1 }
+              }
+            }
+          ],
+          as: "stats"
+        }
+      },
+      {
+        $addFields: {
+          last_booking: { $arrayElemAt: ["$stats.last_booking", 0] },
+          total_bookings: {
+            $ifNull: [{ $arrayElemAt: ["$stats.total_bookings", 0] }, 0]
+          }
+        }
+      },
+      {
+        $addFields: {
+          segment: {
+            $switch: {
+              branches: [
+                {
+                  case: {
+                    $and: [
+                      {
+                        $gte: [
+                          "$createdAt",
+                          {
+                            $dateSubtract: {
+                              startDate: "$$NOW",
+                              unit: "day",
+                              amount: 30
+                            }
+                          }
+                        ]
+                      },
+                      { $gt: ["$total_bookings", 0] }
+                    ]
+                  },
+                  then: "new_active"
+                },
+                {
+                  case: {
+                    $gte: [
+                      "$createdAt",
+                      {
+                        $dateSubtract: {
+                          startDate: "$$NOW",
+                          unit: "day",
+                          amount: 30
+                        }
+                      }
+                    ]
+                  },
+                  then: "new_inactive"
+                },
+                {
+                  case: {
+                    $gte: [
+                      "$last_booking",
+                      {
+                        $dateSubtract: {
+                          startDate: "$$NOW",
+                          unit: "day",
+                          amount: 30
+                        }
+                      }
+                    ]
+                  },
+                  then: "active"
+                },
+                {
+                  case: {
+                    $gte: [
+                      "$last_booking",
+                      {
+                        $dateSubtract: {
+                          startDate: "$$NOW",
+                          unit: "day",
+                          amount: 90
+                        }
+                      }
+                    ]
+                  },
+                  then: "dormant"
+                }
+              ],
+              default: "churned"
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          role: 1,
+          createdAt: 1,
+          last_booking: 1,
+          total_bookings: 1,
+          segment: 1
+        }
+      }
+    ];
+
+    const result = await db.collection("users").aggregate(pipeline).toArray();
+    return result[0] || null;
+};
+
+// ⭐ USER RATINGS
+exports.getUserRatingStats = async (userId) => {
+    const db = getDb();
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error("Invalid userId");
+    }
+
+    const uid = new mongoose.Types.ObjectId(userId);
+
+    const ratings = await db.collection("customerreviews")
+        .find({ customer: uid })
+        .project({ ratings: 1 })
+        .toArray();
+
+    if (!ratings.length) return { average: 0, count: 0, distribution: [] };
+
+    let sum = 0;
+    const distMap = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    
+    ratings.forEach(r => {
+        const val = r.ratings || 0;
+        sum += val;
+        if (val >= 1 && val <= 5) distMap[val]++;
+    });
+
+    return {
+        average: parseFloat((sum / ratings.length).toFixed(1)),
+        count: ratings.length,
+        distribution: [
+            { rating: "1 Star", count: distMap[1] },
+            { rating: "2 Stars", count: distMap[2] },
+            { rating: "3 Stars", count: distMap[3] },
+            { rating: "4 Stars", count: distMap[4] },
+            { rating: "5 Stars", count: distMap[5] }
+        ]
+    };
+};
+
