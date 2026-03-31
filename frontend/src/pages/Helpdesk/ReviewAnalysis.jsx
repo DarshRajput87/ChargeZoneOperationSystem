@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import API from "../../services/api";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from "recharts";
+import API from "../../services/api";
 
 // ── Lucide-style inline SVG icons (no emoji, no external deps) ──
 const Icons = {
@@ -181,7 +181,7 @@ export default function ReviewAnalysis() {
     setError(null);
     API.get("/review-analysis?HelpNeeded=yes")
       .then(res => {
-        const rows = (res.data || []).filter(i => i.rating <= 3);
+        const rows = (res.data.data || []).filter(i => i.rating <= 3);
         setData(rows);
         buildKpis(rows);
         setLoading(false);
