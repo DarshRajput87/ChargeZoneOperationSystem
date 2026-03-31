@@ -43,3 +43,14 @@ exports.getChargeCoinsHistory = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch charge coins history" });
     }
 };
+
+exports.getUserSegment = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const data = await service.getUserSegment(userId);
+        res.json({ segmentData: data });
+    } catch (err) {
+        console.error("getUserSegment error:", err);
+        res.status(500).json({ error: "Failed to get user segment" });
+    }
+};

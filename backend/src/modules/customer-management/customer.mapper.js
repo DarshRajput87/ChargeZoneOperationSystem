@@ -12,7 +12,6 @@ const mapBookingMethod = (method) => {
 };
 
 const getChargeclubTier = (units = 0) => {
-    if (units <= 50) return "Bronze";
     if (units <= 100) return "Bronze";
     if (units <= 200) return "Silver";
     if (units <= 400) return "Gold";
@@ -21,7 +20,7 @@ const getChargeclubTier = (units = 0) => {
     return "Red";
 };
 
-exports.formatUser = ({ user, vehicles, bookingsResult, query, chargeCoinsSummary }) => {
+exports.formatUser = ({ user, vehicles, bookingsResult, query, chargeCoinsSummary, segmentData, ratingStats }) => {
     const { bookings = [], totalBookings = 0 } = bookingsResult;
 
     const page = parseInt(query?.page) || 1;
@@ -41,8 +40,15 @@ exports.formatUser = ({ user, vehicles, bookingsResult, query, chargeCoinsSummar
             chargeclubTier: getChargeclubTier(totalUnits),
             createdAt: user.createdAt,
             chargeCoins: {
-                available: user.charge_coin || 0,
+                available: user.chargecoins_v2,
                 totalCount: chargeCoinsSummary.availableCoins || 0
+            },
+            segment: segmentData?.segment || "N/A",
+            lastBooking: segmentData?.last_booking || null,
+            rating: {
+                average: ratingStats?.average || 0,
+                count: ratingStats?.count || 0,
+                distribution: ratingStats?.distribution || []
             }
 
         },
