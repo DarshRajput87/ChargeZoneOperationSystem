@@ -2,7 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const API = axios.create({
-  baseURL: "https://api.chargezoneops.online/api",
+  baseURL: "http://13.232.112.152/api",
 });
 
 API.interceptors.request.use(

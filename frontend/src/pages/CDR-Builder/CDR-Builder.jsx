@@ -42,7 +42,7 @@ export default function CDRBuilder() {
 
   const textareaRef = useRef(null);
 
-  const BUILD_URL = "https://api.chargezoneops.online/api/cdr-recovery/build";
+  const BUILD_URL = "http://13.232.112.152/api/cdr-recovery/build";
   const POST_URL = "https://api.chargecloud.net/ocpi/emsp/2.2/cdrs";
 
   const autoResize = () => {
