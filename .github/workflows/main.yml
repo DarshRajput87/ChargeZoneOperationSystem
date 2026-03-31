@@ -2,7 +2,7 @@ name: Deploy Backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy_backend:
@@ -17,16 +17,22 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y openssh-client rsync
 
+      # ✅ FIXED SSH SETUP (no ssh-agent)
       - name: Setup SSH
         run: |
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
+      # ✅ ensure SSH uses this key
+      - name: Configure SSH
+        run: |
+          echo "Host *" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+
       - name: Set release variable
-        id: vars
         run: echo "RELEASE=$(date +%s)" >> $GITHUB_ENV
 
       - name: Create release directory
@@ -49,10 +55,10 @@ jobs:
             set -e
             cd ${{ secrets.PROJECT_PATH }}/releases/$RELEASE/backend
             npm ci --omit=dev
-            ln -sfn ${{ secrets.PROJECT_PATH }}/releases/$RELEASE ${{ secrets.PROJECT_PATH }}/current &&
-            ln -sfn ${{ secrets.PROJECT_PATH }}/shared/.env ${{ secrets.PROJECT_PATH }}/current/backend/.env &&
+            ln -sfn ${{ secrets.PROJECT_PATH }}/releases/$RELEASE ${{ secrets.PROJECT_PATH }}/current
+            ln -sfn ${{ secrets.PROJECT_PATH }}/shared/.env ${{ secrets.PROJECT_PATH }}/current/backend/.env
             pm2 delete server || true
-            pm2 start ${{ secrets.PROJECT_PATH }}/current/backend/src/server.js --name server &&
+            pm2 start ${{ secrets.PROJECT_PATH }}/current/backend/src/server.js --name server
             pm2 save
           "
 
