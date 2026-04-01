@@ -1,7 +1,19 @@
 import API from "./api";
 
-export const searchUsers = async (query) => {
-    const res = await API.get(`/customers/search?query=${encodeURIComponent(query)}`);
+export const searchUsers = async (query, filters = {}, page = 1, limit = 20) => {
+    const params = new URLSearchParams();
+    if (query) params.append("query", query);
+    if (filters.startDate) params.append("startDate", filters.startDate);
+    if (filters.endDate) params.append("endDate", filters.endDate);
+    if (filters.segment) params.append("segment", filters.segment);
+    if (filters.hasFeedback) params.append("hasFeedback", "true");
+    if (filters.ratings && filters.ratings.length > 0) {
+        params.append("ratings", filters.ratings.join(","));
+    }
+    params.append("page", page);
+    params.append("limit", limit);
+
+    const res = await API.get(`/customers/search?${params.toString()}`);
     return res.data;
 };
 

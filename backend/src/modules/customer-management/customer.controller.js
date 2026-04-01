@@ -6,13 +6,13 @@ exports.searchUsers = async (req, res) => {
 
         // Construct filter object
         const filters = { startDate, endDate, segment };
-
+        
         if (hasFeedback === "true") filters.hasFeedback = true;
-
+        
         if (ratings) {
             // Handle both array and comma-separated string
-            filters.ratings = Array.isArray(ratings)
-                ? ratings.map(Number)
+            filters.ratings = Array.isArray(ratings) 
+                ? ratings.map(Number) 
                 : ratings.split(",").map(Number);
         }
 
