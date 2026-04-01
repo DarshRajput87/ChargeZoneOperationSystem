@@ -1,8 +1,8 @@
 const repo = require("./customer.repository");
 const mapper = require("./customer.mapper");
 
-exports.searchUsers = async (query) => {
-    return repo.searchUsers(query);
+exports.searchUsers = async (query, filters, page, limit) => {
+    return repo.searchUsers(query, filters, page, limit);
 };
 
 exports.getUserDetails = async (userId, query) => {
@@ -10,7 +10,7 @@ exports.getUserDetails = async (userId, query) => {
         repo.getUser(userId),
         repo.getVehicles(userId),
         repo.getBookings(userId, query),
-        repo.getUserSegment(userId),
+        repo.getUserSegment(userId, query.refDate || query.endDate),
         repo.getUserRatingStats(userId),
     ]);
     const chargeCoinsSummary = await repo.getChargeCoinsSummary(userId);

@@ -2,13 +2,21 @@ const service = require("./customer.service");
 
 exports.searchUsers = async (req, res) => {
     try {
-        const { query } = req.query;
+        const { query, startDate, endDate, segment, hasFeedback, ratings, page = 1, limit = 20 } = req.query;
 
-        if (!query) {
-            return res.status(400).json({ message: "Query is required" });
+        // Construct filter object
+        const filters = { startDate, endDate, segment };
+
+        if (hasFeedback === "true") filters.hasFeedback = true;
+
+        if (ratings) {
+            // Handle both array and comma-separated string
+            filters.ratings = Array.isArray(ratings)
+                ? ratings.map(Number)
+                : ratings.split(",").map(Number);
         }
 
-        const data = await service.searchUsers(query);
+        const data = await service.searchUsers(query, filters, parseInt(page), parseInt(limit));
 
         res.json(data);
     } catch (err) {
