@@ -114,7 +114,7 @@ export default function CDRBuilder() {
         {/* Header */}
         <header className="cdr-page-header">
           <p className="cdr-eyebrow">EMSP · OCPI 2.2</p>
-          <h1 className="cdr-title">CDR Builder</h1>
+          <h1 className="cdr-title">Session Settlement</h1>
           <p className="cdr-subtitle">Build and push charge detail records to the EMSP endpoint</p>
         </header>
 

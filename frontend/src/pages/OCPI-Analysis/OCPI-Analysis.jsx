@@ -266,7 +266,7 @@ const OCPIAnalysis = () => {
                     className="success"
                     label="Successful"
                     value={fmt(success)}
-                    sub="Status 2xx responses"
+                    sub="Status  responses"
                     icon="✅"
                     accent="highlight-green"
                     progress={parseFloat(rate)}
@@ -284,7 +284,7 @@ const OCPIAnalysis = () => {
                     className="failed"
                     label="Failed"
                     value={fmt(failed)}
-                    sub="Non-2xx responses"
+                    sub="Status responses"
                     icon="⚠️"
                     accent="highlight-red"
                     progress={total ? (failed / total) * 100 : 0}

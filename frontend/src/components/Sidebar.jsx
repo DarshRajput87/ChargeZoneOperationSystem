@@ -125,7 +125,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 className="submenu-item"
                 onClick={onClose}
               >
-                CDR Builder
+                Session Settlement
               </NavLink>
 
             </div>
