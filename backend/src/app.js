@@ -19,12 +19,22 @@ const customerRoutes = require("./modules/customer-management/customer.routes");
 const reviewAnalysisRoutes = require("./modules/review-analysis/reviewAnalysis.routes");
 const feedbackRoutes = require("./modules/feedback/feedback.routes");
 
-
 const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: [
+    "https://www.chargezoneops.online",
+    "https://chargezoneops.online",
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests before auth middleware
 app.use(express.json());
 
 // Public routes
@@ -51,6 +61,5 @@ app.use("/api/ocpi-analytics", ocpiAnalyticsRoutes);
 app.use("/api/helpdesk", helpdeskRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/review-analysis", reviewAnalysisRoutes);
-
 
 module.exports = app;
