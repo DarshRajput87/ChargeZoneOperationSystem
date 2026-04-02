@@ -266,7 +266,7 @@ export default function CustomerManagement() {
                     <div className="cm-search-input-wrap">
                         <input
                             type="text"
-                            placeholder="Search by phone number or user ID…"
+                            placeholder="Search by phone number and name...."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={handleKeyDown}
