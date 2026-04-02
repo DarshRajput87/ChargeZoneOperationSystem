@@ -386,7 +386,7 @@ export default function CustomerManagement() {
                                         </div>
                                         <div className="cm-result-info">
                                             <div className="cm-result-phone">{u.phone}</div>
-                                            <div className="cm-result-name">{u.name || "Unknown"}</div>
+                                            <div className="cm-result-name">{u.name || "Guest User"}</div>
                                         </div>
                                     </div>
 

@@ -322,7 +322,9 @@
     border-bottom: none;
 }
 
-.fsla-table td:first-child {
+.fsla-table td:first-child,
+.fsla-table th:nth-child(2),
+.fsla-table td:nth-child(2) {
     text-align: left;
 }
 
@@ -384,19 +386,17 @@
 }
 
 .fsla-badge.status-other {
-    background: var(--amber-soft);
-    color: var(--amber);
-    border: 1px solid rgba(245, 158, 11, 0.25);
+    background: none;
+    color: #8ba0b8;
+    border: none;
+    padding: 0;
+    font-size: 13px;
 }
 
 .fsla-badge.status-other::before {
-    content: '';
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--amber);
-    flex-shrink: 0;
+    display: none;
 }
+
 
 .fsla-badge.party {
     background: rgba(255, 255, 255, 0.05);
