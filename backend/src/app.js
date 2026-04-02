@@ -31,22 +31,18 @@ const corsOptions = {
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204,  // ✅ handles preflight internally
 };
 
+// ✅ Apply CORS ONCE (important)
 app.use(cors(corsOptions));
-// Remove the app.options("*", ...) line entirely
 
-app.use(cors(corsOptions));
-app.options("(.*)", cors(corsOptions));  // ✅ Express 5 compatible // Handle preflight requests before auth middleware
 app.use(express.json());
 
 // Public routes
 app.use("/api/auth", authRoutes);
 app.use("/feedback", feedbackRoutes);
 
-// Global authentication and authorization middleware
+// Protected middleware
 app.use(protect);
 app.use(blockViewerChanges);
 
