@@ -24,17 +24,22 @@ const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
 const app = express();
 
 const corsOptions = {
-  origin: [
-    "https://www.chargezoneops.online",
-    "https://chargezoneops.online",
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+    origin: [
+        "https://www.chargezoneops.online",
+        "https://chargezoneops.online",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,  // ✅ handles preflight internally
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests before auth middleware
+// Remove the app.options("*", ...) line entirely
+
+app.use(cors(corsOptions));
+app.options("(.*)", cors(corsOptions));  // ✅ Express 5 compatible // Handle preflight requests before auth middleware
 app.use(express.json());
 
 // Public routes
