@@ -232,7 +232,6 @@ const Dashboard = () => {
             {/* Bar breakdown */}
             <div className="chart-card">
               <div className="chart-card-title">Charger Breakdown</div>
-              <div className="chart-card-sub">% share of total fleet</div>
               <ul className="status-list">
                 {chargerData.map((item, i) => {
                   const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
