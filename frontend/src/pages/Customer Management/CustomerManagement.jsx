@@ -264,10 +264,6 @@ export default function CustomerManagement() {
             <div className="cm-search-panel">
                 <div className="cm-search-row">
                     <div className="cm-search-input-wrap">
-                        <svg className="cm-search-icon" viewBox="0 0 20 20" fill="none">
-                            <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.6" />
-                            <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                        </svg>
                         <input
                             type="text"
                             placeholder="Search by phone number or user ID…"
