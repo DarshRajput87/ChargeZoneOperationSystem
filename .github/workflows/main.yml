@@ -22,7 +22,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
 
-          printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
           HOST="${{ secrets.EC2_HOST }}"
