@@ -17,27 +17,28 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y openssh-client rsync
 
-      # ✅ SSH SETUP (FIXED + VALIDATION)
+      # ✅ SSH SETUP (ROBUST)
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
+
           printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+          HOST="${{ secrets.EC2_HOST }}"
+
+          if [ -z "$HOST" ]; then
             echo "EC2_HOST is empty ❌"
             exit 1
           fi
 
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
 
-      # ✅ SSH CONFIG (CLEAN)
-      - name: Configure SSH
-        run: |
           echo "Host *" >> ~/.ssh/config
           echo "  IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
-      # ✅ RELEASE VARIABLE (SAFE)
+      # ✅ RELEASE VARIABLE
       - name: Set release variable
         run: |
           RELEASE=$(date +%s)
@@ -47,26 +48,29 @@ jobs:
       # ✅ CREATE RELEASE DIR
       - name: Create release directory
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+          ssh -o ConnectTimeout=10 ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
           "mkdir -p ${{ secrets.PROJECT_PATH }}/releases/$RELEASE"
 
-      # ✅ RSYNC DEPLOY
+      # ✅ RSYNC DEPLOY (SAFER)
       - name: Rsync files
         run: |
-          rsync -az --delete \
+          rsync -az \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.env' \
             --exclude='logs' \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.PROJECT_PATH }}/releases/$RELEASE
 
-      # ✅ INSTALL + START (NO DOWNTIME VERSION)
+      # ✅ INSTALL + START (FIXED)
       - name: Install & Start Backend
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          ssh -o ConnectTimeout=10 ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             set -e
 
-            cd ${{ secrets.PROJECT_PATH }}/releases/$RELEASE/backend
+            # switch to new release
+            ln -sfn ${{ secrets.PROJECT_PATH }}/releases/$RELEASE ${{ secrets.PROJECT_PATH }}/current
+
+            cd ${{ secrets.PROJECT_PATH }}/current/backend
 
             npm ci --omit=dev
 
@@ -76,11 +80,9 @@ jobs:
               exit 1
             fi
 
-            # switch current release
-            ln -sfn ${{ secrets.PROJECT_PATH }}/releases/$RELEASE ${{ secrets.PROJECT_PATH }}/current
-            ln -sfn ${{ secrets.PROJECT_PATH }}/shared/.env ${{ secrets.PROJECT_PATH }}/current/backend/.env
+            ln -sfn ${{ secrets.PROJECT_PATH }}/shared/.env .env
 
-            # restart safely (no downtime crash)
+            # restart app safely
             pm2 restart server || pm2 start src/server.js --name server
 
             pm2 save
