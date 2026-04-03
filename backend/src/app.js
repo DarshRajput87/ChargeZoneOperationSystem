@@ -23,17 +23,16 @@ const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
 
 const app = express();
 
-const corsOptions = {
-    origin: [
-        "https://www.chargezoneops.online",
-        "https://chargezoneops.online",
-        "https://cz.ops.chargecloud.net",
-        "http://cz.ops.chargecloud.net"
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-};
+const cors = require("cors");
+
+app.use(cors({
+  origin: [
+    "https://cz.ops.chargecloud.net",
+    "http://localhost:5173" // dev
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
 // ✅ Apply CORS ONCE (important)
 app.use(cors(corsOptions));
