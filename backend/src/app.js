@@ -27,6 +27,7 @@ const corsOptions = {
     origin: [
         "https://www.chargezoneops.online",
         "https://chargezoneops.online",
+        "https://cz.ops.chargecloud.net"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
