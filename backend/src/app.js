@@ -32,7 +32,6 @@ app.use(cors({
     credentials: true
 }));
 
-// ✅ Apply CORS ONCE (important)
 
 app.use(express.json());
 
