@@ -137,7 +137,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               </div>
 
               <NavLink to="/emsp-CDR-Builder" className="submenu-item" onClick={onClose}>
-                CDR Builder
+                Session Settlement
               </NavLink>
 
             </div>
