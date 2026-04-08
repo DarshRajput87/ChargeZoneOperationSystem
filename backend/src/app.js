@@ -31,7 +31,7 @@ app.use(cors({
         "https://chargezoneops.online",
         "http://localhost:5173" // dev
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }));
 

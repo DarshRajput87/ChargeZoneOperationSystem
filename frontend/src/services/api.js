@@ -1,8 +1,10 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
+export const BASE_URL = "https://chargezoneoperationsystem.onrender.com/api";
+
 const API = axios.create({
-  baseURL: "https://chargezoneoperationsystem.onrender.com/api",
+  baseURL: BASE_URL,
   withCredentials: true
 });
 

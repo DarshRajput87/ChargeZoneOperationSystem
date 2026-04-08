@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import './UserSegmentation.css'
 import ComparisonChart from './ComparisonChart'
 import SegmentUsersTable from './SegmentUsersTable'
-import API from '../../services/api'
+import API, { BASE_URL } from '../../services/api'
 
 const SEGMENTS = [
   {
@@ -253,7 +253,7 @@ export default function App() {
     fetchMetrics()
 
     const token = localStorage.getItem('token');
-    const es = new EventSource(`/api/segments/stream?role=${roleQuery}&token=${token}`)
+    const es = new EventSource(`${BASE_URL}/segments/stream?role=${roleQuery}&token=${token}`)
     esRef.current = es
 
     es.onmessage = (e) => {
