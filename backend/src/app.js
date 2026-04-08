@@ -27,6 +27,8 @@ const app = express();
 app.use(cors({
     origin: [
         "https://cz.ops.chargecloud.net",
+        "https://www.chargezoneops.online",
+        "https://chargezoneops.online",
         "http://localhost:5173" // dev
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
