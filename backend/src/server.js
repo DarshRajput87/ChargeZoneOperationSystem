@@ -17,67 +17,78 @@ mongoose.set('returnDocument', 'after');
 
 
 // =====================================================
+// 🟢 START SERVER
+// =====================================================
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+// =====================================================
 // 🔵 CONNECT COE DATABASE (Local)
 // =====================================================
-
 mongoose.connect(process.env.MONGO_URI, {
-  dbName: "ChargeZoneOperationEngine",
+    dbName: "ChargeZoneOperationEngine",
 })
-  .then(() => {
+    .then(() => {
+        console.log("COE MongoDB Connected");
+        // expose COE DB globally
+        global.coeDb = mongoose.connection.db;
 
-    console.log("COE MongoDB Connected");
+        // =====================================================
+        // 🟣 CONNECT CMS DATABASE (Atlas)
+        // =====================================================
+        const cmsConnection = mongoose.createConnection(
+            process.env.CMS_MONGO_URI,
+            { dbName: "chargezoneprod" }
+        );
 
-    // expose COE DB globally
-    global.coeDb = mongoose.connection.db;
+        cmsConnection.once("open", async () => {
+            console.log("CMS MongoDB Connected");
+            global.cmsConnection = cmsConnection;
+            global.cmsDb = cmsConnection.db;
 
-    // =====================================================
-    // 🟣 CONNECT CMS DATABASE (Atlas)
-    // =====================================================
+            // ───────────────── Dashboard Metrics (every 15 min)
+            try {
+                await generateMetrics();
+            } catch (err) {
+                console.error("Initial metrics error:", err);
+            }
 
-    const cmsConnection = mongoose.createConnection(
-      process.env.CMS_MONGO_URI,
-      { dbName: "chargezoneprod" }
-    );
+            cron.schedule("*/15 * * * *", async () => {
+                try { await generateMetrics(); } catch (e) { console.error(e); }
+            });
 
-    cmsConnection.once("open", async () => {
+            // ───────────────── SLA Sync (every hour)
+            try {
+                await syncSlaStatuses(global.coeDb, global.cmsDb);
+            } catch (err) {
+                console.error("Initial SLA sync error:", err);
+            }
 
-      console.log("CMS MongoDB Connected");
+            cron.schedule("0 * * * *", async () => {
+                try { await syncSlaStatuses(global.coeDb, global.cmsDb); } catch (e) { console.error(e); }
+            });
 
-      global.cmsConnection = cmsConnection;
-      global.cmsDb = cmsConnection.db;
+            // ───────────────── Faulty Analysis
+            try {
+                await generateFaultyAnalysis();
+            } catch (err) {
+                console.error("Initial faulty analysis error:", err);
+            }
 
-      // ───────────────── Dashboard Metrics (every 15 min)
-      await generateMetrics();
+            cron.schedule("*/30 * * * *", async () => {
+                try { await generateFaultyAnalysis(); } catch (e) { console.error(e); }
+            });
+        });
 
-      cron.schedule("*/15 * * * *", async () => {
-        await generateMetrics();
-      });
+        cmsConnection.on("error", (err) => {
+            console.error("CMS MongoDB connection error:", err);
+        });
 
-      // ───────────────── SLA Sync (every hour)
-      await syncSlaStatuses(global.coeDb, global.cmsDb);
-
-      cron.schedule("0 * * * *", async () => {
-        await syncSlaStatuses(global.coeDb, global.cmsDb);
-      });
-
-      // ───────────────── Faulty Analysis
-      await generateFaultyAnalysis();
-
-      cron.schedule("*/30 * * * *", async () => {
-        await generateFaultyAnalysis();
-      });
-
-      // ───────────────── Start Server
-      app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
-
+    })
+    .catch((err) => {
+        console.error("COE MongoDB connection error:", err);
     });
-
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-  });
 
 console.log("Deployment Done for general");
 console.log("Change Reflected")

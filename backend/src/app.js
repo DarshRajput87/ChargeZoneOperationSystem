@@ -25,15 +25,26 @@ const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
 const app = express();
 
 app.use(cors({
-    origin: [
-        "https://cz.ops.chargecloud.net",
-        "https://www.chargezoneops.online",
-        "https://chargezoneops.online",
-        "http://localhost:5173" // dev
-    ],
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            "https://cz.ops.chargecloud.net",
+            "https://www.chargezoneops.online",
+            "https://chargezoneops.online",
+            "http://localhost:5173"
+        ];
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
+
+// Basic health check for Render
+app.get("/", (req, res) => res.status(200).send("Backend is live"));
 
 
 app.use(express.json());
