@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 
 const API = axios.create({
   baseURL: "https://chargezoneoperationsystem.onrender.com/api",
+  withCredentials: true
 });
 
 API.interceptors.request.use(
@@ -37,4 +38,5 @@ API.interceptors.response.use(
 );
 
 export default API;
+
 

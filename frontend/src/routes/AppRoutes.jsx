@@ -20,6 +20,7 @@ import UserReview from "../pages/Helpdesk/HelpdeskPage";
 import ClosedTickets from "../pages/Helpdesk/ClosedTickets";
 import ReviewAnalysis from "../pages/Helpdesk/ReviewAnalysis";
 import CustomerManagement from "../pages/Customer Management/CustomerManagement";
+import UserSegmentation from "../pages/UserSegmentation/UserSegmentation";
 
 const AppRoutes = () => {
   return (
@@ -167,6 +168,15 @@ const AppRoutes = () => {
           element={
             <DashboardLayout>
               <CustomerManagement />
+            </DashboardLayout>
+          }
+        />
+
+        <Route
+          path="/user-segmentation"
+          element={
+            <DashboardLayout>
+              <UserSegmentation />
             </DashboardLayout>
           }
         />

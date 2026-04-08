@@ -36,6 +36,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           {/* Customer Management */}
           <NavLink to="/customer-management" onClick={onClose}>Customer Management</NavLink>
 
+          {/* User Segmentation */}
+          <NavLink to="/user-segmentation" onClick={onClose}>User Segmentation</NavLink>
+
           {/* User Review */}
           <div className="menu-module">
             <div
@@ -137,7 +140,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               </div>
 
               <NavLink to="/emsp-CDR-Builder" className="submenu-item" onClick={onClose}>
-                Session Settlement
+                CDR Builder
               </NavLink>
 
             </div>
@@ -168,6 +171,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           {openModule === "user-review" && (
             <div className="submenu">
               <NavLink to="/customer-management" onClick={onClose}>Customer Management</NavLink>
+              <NavLink to="/user-segmentation" className="submenu-item" onClick={onClose}>User Segmentation</NavLink>
               <NavLink to="/user-review/pending-tickets" className="submenu-item" onClick={onClose}>
                 Pending Tickets
               </NavLink>

@@ -18,6 +18,7 @@ const helpdeskRoutes = require("./modules/helpdesk/helpdesk.routes");
 const customerRoutes = require("./modules/customer-management/customer.routes");
 const reviewAnalysisRoutes = require("./modules/review-analysis/reviewAnalysis.routes");
 const feedbackRoutes = require("./modules/feedback/feedback.routes");
+const userSegmentationRoutes = require("./modules/user-segmentation/segmentation.routes");
 
 const { protect, blockViewerChanges } = require("./middleware/auth.middleware");
 
@@ -25,8 +26,8 @@ const app = express();
 
 app.use(cors({
     origin: [
-        "https://chargezoneops.online",
-        "https://www.chargezoneops.online",
+        "https://cz.ops.chargecloud.net",
+        "http://localhost:5173" // dev
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
@@ -59,5 +60,6 @@ app.use("/api/ocpi-analytics", ocpiAnalyticsRoutes);
 app.use("/api/helpdesk", helpdeskRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/review-analysis", reviewAnalysisRoutes);
+app.use("/api", userSegmentationRoutes);
 
 module.exports = app;
