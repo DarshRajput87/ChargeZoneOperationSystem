@@ -305,7 +305,7 @@ export default function FaultyAnalysis() {
                 <div className="chart-card">
                     <div className="card-header">
                         <h4><span className="card-dot blue" />Fault Trend</h4>
-                        <span className="card-count">{trendData.length} day{trendData.length !== 1 ? "s" : ""}</span>
+                        <span className="card-count-fa">{trendData.length} day{trendData.length !== 1 ? "s" : ""}</span>
                     </div>
                     <ResponsiveContainer width="100%" height={230}>
                         <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
@@ -335,7 +335,7 @@ export default function FaultyAnalysis() {
                 <div className="chart-card">
                     <div className="card-header">
                         <h4><span className="card-dot orange" />Party Distribution</h4>
-                        <span className="card-count">{partyDist.length} parties</span>
+                        <span className="card-count-fa">{partyDist.length} parties</span>
                     </div>
                     {partyDist.length === 0
                         ? <div className="empty-state"><span className="empty-icon">🏢</span>No data</div>
@@ -367,7 +367,7 @@ export default function FaultyAnalysis() {
                 <div className="chart-card">
                     <div className="card-header">
                         <h4><span className="card-dot purple" />Fault Reasons</h4>
-                        <span className="card-count">{reasonDist.length} type{reasonDist.length !== 1 ? "s" : ""}</span>
+                        <span className="card-count-fa">{reasonDist.length} type{reasonDist.length !== 1 ? "s" : ""}</span>
                     </div>
                     {reasonDist.length === 0
                         ? <div className="empty-state"><span className="empty-icon">📋</span>No reasons found</div>
@@ -413,7 +413,7 @@ export default function FaultyAnalysis() {
                 <div className="chart-card">
                     <div className="card-header">
                         <h4><span className="card-dot green" />Top Faulty Stations</h4>
-                        <span className="card-count">{stationMap.length} stations</span>
+                        <span className="card-count-fa">{stationMap.length} stations</span>
                     </div>
                     {stationMap.length === 0
                         ? <div className="empty-state"><span className="empty-icon">📍</span>No stations</div>
@@ -448,7 +448,7 @@ export default function FaultyAnalysis() {
             <div className="chart-card" style={{ marginTop: 16 }}>
                 <div className="card-header">
                     <h4><span className="card-dot blue" />Recent Faulty Sessions</h4>
-                    <span className="card-count">{rows.length} records</span>
+                    <span className="card-count-fa">{rows.length} records</span>
                 </div>
                 {rows.length === 0
                     ? (

@@ -186,6 +186,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         <NavLink to="/analysis" onClick={onClose}>OCPI Analysis</NavLink>
+        <NavLink to="/ocpi-analysis-charts" onClick={onClose}>OCPI Charts</NavLink>
         <NavLink to="/settings" onClick={onClose}>Settings</NavLink>
 
       </nav>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
-import API from "../../services/api";
+import React, { useState } from "react";
+import { useOCPI } from "../../context/OCPIContext";
 import "./OCPIAnalysis.css";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -45,81 +45,35 @@ const statusClass = (code) => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const OCPIAnalysis = () => {
-    const [logs, setLogs] = useState([]);
-    const [summary, setSummary] = useState(null);
-    const [modules, setModules] = useState([]);
-    const [parties, setParties] = useState([]);
-    const [tenants, setTenants] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const { 
+        masterData, 
+        loading, 
+        error: contextError, 
+        filters, 
+        setFilter, 
+        fetchData,
+        parties,
+        tenants
+    } = useOCPI();
+
     const [viewingMessage, setViewingMessage] = useState(null);
 
-    const [filters, setFilters] = useState({
-        date: getLocalYMD(),
-        limit: 20,
-        module: "",
-        party_id: "",
-        tenant_id: "",
-        status: "",
-        booking_type: "ocpi"
-    });
+    // Synchronize local error with context or page state if needed
+    const error = contextError;
 
     // ── Fetch ────────────────────────────────────────────────────────────────
-    const fetchData = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            let query = `?date=${filters.date}&limit=${filters.limit}`;
-            if (filters.module) query += `&module=${filters.module}`;
-            if (filters.party_id) query += `&party_id=${filters.party_id}`;
-            if (filters.tenant_id) query += `&tenant_id=${filters.tenant_id}`;
-            if (filters.status) query += `&status=${filters.status}`;
-            if (filters.booking_type) query += `&booking_type=${filters.booking_type}`;
-
-            const base = "/ocpi-analytics";
-
-            const [logsRes, summaryRes, modulesRes] = await Promise.all([
-                API.get(`${base}/logs${query}`),
-                API.get(`${base}/summary${query}`),
-                API.get(`${base}/modules${query}`),
-            ]);
-
-            setLogs(logsRes.data.data || []);
-            setSummary(summaryRes.data.data?.[0] || null);
-            setModules(modulesRes.data.data || []);
-        } catch (err) {
-            console.error("Error fetching OCPI data:", err);
-            setError("Unable to reach the OCPI API. Check that the server is running.");
-        } finally {
-            setLoading(false);
-        }
-    }, [filters]);
-
-    useEffect(() => {
-        API.get("/ocpi-analytics/all-parties")
-            .then(res => setParties(res.data.data || []))
-            .catch(console.error);
-
-        API.get("/ocpi-analytics/tenants")
-            .then(res => setTenants(res.data.data || []))
-            .catch(console.error);
-    }, []);
-
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(fetchData, 10 * 60 * 1000);
-        return () => clearInterval(interval);
-    }, [fetchData]);
+    // Data is managed by useOCPI()
 
     // ── Derived numbers ──────────────────────────────────────────────────────
+    // summary and logs come from masterData provided by context
+    const summary = masterData?.summary || null;
+    const logs = masterData?.logs || [];
+    const modules = masterData?.modules || [];
+
     const total = summary?.total ?? 0;
     const success = summary?.success ?? 0;
     const failed = total - success;
     const rate = pct(success, total);
-
-    const setFilter = (key, val) =>
-        setFilters(f => ({ ...f, [key]: val }));
 
     // ── Render ───────────────────────────────────────────────────────────────
     return (
