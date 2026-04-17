@@ -23,6 +23,7 @@ import CustomerManagement from "../pages/Customer Management/CustomerManagement"
 import UserSegmentation from "../pages/UserSegmentation/UserSegmentation";
 import Settings from "../pages/Settings/Settings";
 import OCPIAnalysisChart from "../pages/Ocpi-Analysis-charts/OCPIAnalysisChart";
+import { OCPIProvider } from "../context/OCPIContext";
 
 
 const AppRoutes = () => {
@@ -152,7 +153,9 @@ const AppRoutes = () => {
           path="/analysis"
           element={
             <DashboardLayout>
-              <OCPIAnalysis />
+              <OCPIProvider>
+                <OCPIAnalysis />
+              </OCPIProvider>
             </DashboardLayout>
           }
         />
@@ -195,7 +198,9 @@ const AppRoutes = () => {
           path="/ocpi-analysis-charts"
           element={
             <DashboardLayout>
-              <OCPIAnalysisChart />
+              <OCPIProvider>
+                <OCPIAnalysisChart />
+              </OCPIProvider>
             </DashboardLayout>
           }
         />
