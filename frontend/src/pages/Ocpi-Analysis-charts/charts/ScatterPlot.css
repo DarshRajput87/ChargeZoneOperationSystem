@@ -1,0 +1,213 @@
+/* ─── ScatterPlot.css ────────────────────────────────────────────────────── */
+/* Clean analytics scatter plot · dark theme · party-colored dots              */
+
+.scatter-chart-card {
+    min-height: 420px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.scatter-chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.scatter-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* ── Party Legend Strip ─────────────────────────────────────────────────── */
+.sct-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding: 7px 10px;
+    background: rgba(255, 255, 255, 0.012);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    max-height: 64px;
+    overflow-y: auto;
+}
+
+.sct-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 2px 7px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1.4;
+}
+
+.sct-chip:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.sct-chip.selected {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.sct-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* scrollbar */
+.sct-legend::-webkit-scrollbar { width: 3px; }
+.sct-legend::-webkit-scrollbar-track { background: transparent; }
+.sct-legend::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.06); border-radius: 3px; }
+
+/* ── Empty State ────────────────────────────────────────────────────────── */
+.scatter-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 260px;
+    gap: 8px;
+}
+
+.scatter-empty-icon {
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.08);
+    animation: pulse-fade 2s ease-in-out infinite;
+}
+
+.scatter-empty-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+    margin: 0;
+}
+
+.scatter-empty-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.15);
+    margin: 0;
+}
+
+@keyframes pulse-fade {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* ── Tooltip ────────────────────────────────────────────────────────────── */
+.sct-tooltip {
+    background: rgba(12, 16, 24, 0.96);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    min-width: 180px;
+    overflow: hidden;
+    display: flex;
+}
+
+/* Thin color accent bar on the left */
+.sct-tt-bar {
+    width: 3px;
+    flex-shrink: 0;
+}
+
+.sct-tt-content {
+    padding: 10px 14px;
+    flex: 1;
+}
+
+.sct-tt-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sct-tt-party {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sct-tt-role {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.sct-tt-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    align-items: baseline;
+}
+
+.sct-tt-lbl {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.sct-tt-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.sct-tt-val.accent {
+    color: #00FF9C;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* ── Recharts dot hover glow (applied via CSS on SVG circles) ───────────── */
+.recharts-scatter .recharts-scatter-symbol circle {
+    transition: filter 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.recharts-scatter .recharts-scatter-symbol:hover circle {
+    filter: drop-shadow(0 0 6px currentColor) brightness(1.2);
+    transform: scale(1.3);
+    transform-origin: center;
+}
+
+/* Override any recharts active dot styling */
+.recharts-active-dot circle {
+    filter: drop-shadow(0 0 8px currentColor);
+}

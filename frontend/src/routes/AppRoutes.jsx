@@ -21,6 +21,9 @@ import ClosedTickets from "../pages/Helpdesk/ClosedTickets";
 import ReviewAnalysis from "../pages/Helpdesk/ReviewAnalysis";
 import CustomerManagement from "../pages/Customer Management/CustomerManagement";
 import UserSegmentation from "../pages/UserSegmentation/UserSegmentation";
+import Settings from "../pages/Settings/Settings";
+import OCPIAnalysisChart from "../pages/Ocpi-Analysis-charts/OCPIAnalysisChart";
+
 
 const AppRoutes = () => {
   return (
@@ -177,6 +180,22 @@ const AppRoutes = () => {
           element={
             <DashboardLayout>
               <UserSegmentation />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <DashboardLayout>
+              <Settings />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/ocpi-analysis-charts"
+          element={
+            <DashboardLayout>
+              <OCPIAnalysisChart />
             </DashboardLayout>
           }
         />

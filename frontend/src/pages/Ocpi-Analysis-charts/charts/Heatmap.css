@@ -1,0 +1,109 @@
+/* ─── Heatmap.css ─────────────────────────────────────────────────────────── */
+
+.heatmap-card {
+    overflow: hidden;
+}
+
+.heatmap-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: var(--space-1);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.07) transparent;
+}
+
+.heatmap-wrap::-webkit-scrollbar {
+    height: 3px;
+}
+
+.heatmap-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.heatmap-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 99px;
+}
+
+/* ── Grid ───────────────────────────────────────────────────────────────────── */
+.hm-grid {
+    display: grid;
+    gap: 2px;
+    min-width: 680px;
+}
+
+.hm-corner {
+    /* spacer — intentionally empty */
+}
+
+.hm-hour-label {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--c-text-muted);
+    text-align: center;
+    padding: 0 0 var(--space-2);
+    user-select: none;
+    letter-spacing: 0.02em;
+}
+
+.hm-mod-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--c-text-secondary);
+    display: flex;
+    align-items: center;
+    padding-right: var(--space-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 24px;
+    letter-spacing: 0.02em;
+}
+
+/* ── Cell ───────────────────────────────────────────────────────────────────── */
+.hm-cell {
+    height: 24px;
+    border-radius: 3px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    cursor: default;
+}
+
+.hm-cell:hover {
+    opacity: 0.75;
+    transform: scale(1.18);
+    z-index: 2;
+}
+
+.hm-cell-val {
+    font-family: var(--font-mono);
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.88);
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.02em;
+}
+
+/* ── Legend ─────────────────────────────────────────────────────────────────── */
+.hm-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.hm-legend-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--c-text-muted);
+    letter-spacing: 0.04em;
+}
+
+.hm-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-xs);
+}

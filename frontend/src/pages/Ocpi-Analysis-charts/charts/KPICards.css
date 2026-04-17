@@ -1,0 +1,204 @@
+/* ─── KPICards.css ───────────────────────────────────────────────────────── */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+.kpi-card {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 18px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    cursor: default;
+}
+
+.kpi-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    opacity: 0.7;
+}
+
+.kpi-cyan::before {
+    background: var(--c-cyan);
+}
+
+.kpi-green::before {
+    background: var(--c-success);
+}
+
+.kpi-red::before {
+    background: var(--c-failed);
+}
+
+.kpi-purple::before {
+    background: var(--c-purple);
+}
+
+.kpi-amber::before {
+    background: var(--c-amber);
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+.kpi-cyan:hover {
+    border-color: rgba(0, 200, 255, 0.25);
+    box-shadow: 0 4px 24px rgba(0, 200, 255, 0.08);
+}
+
+.kpi-green:hover {
+    border-color: rgba(0, 229, 160, 0.25);
+    box-shadow: 0 4px 24px rgba(0, 229, 160, 0.08);
+}
+
+.kpi-red:hover {
+    border-color: rgba(255, 77, 106, 0.25);
+    box-shadow: 0 4px 24px rgba(255, 77, 106, 0.08);
+}
+
+.kpi-purple:hover {
+    border-color: rgba(167, 139, 250, 0.25);
+    box-shadow: 0 4px 24px rgba(167, 139, 250, 0.08);
+}
+
+.kpi-amber:hover {
+    border-color: rgba(255, 179, 64, 0.25);
+    box-shadow: 0 4px 24px rgba(255, 179, 64, 0.08);
+}
+
+.kpi-icon-wrap {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.kpi-icon {
+    font-size: 22px;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.kpi-icon-glow {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    filter: blur(8px);
+    opacity: 0.35;
+}
+
+.glow-cyan {
+    background: var(--c-cyan);
+}
+
+.glow-green {
+    background: var(--c-success);
+}
+
+.glow-red {
+    background: var(--c-failed);
+}
+
+.glow-purple {
+    background: var(--c-purple);
+}
+
+.glow-amber {
+    background: var(--c-amber);
+}
+
+.kpi-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--c-text-secondary);
+    margin: 0 0 4px;
+}
+
+.kpi-value {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 2px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.accent-cyan {
+    color: var(--c-cyan);
+}
+
+.accent-green {
+    color: var(--c-success);
+}
+
+.accent-red {
+    color: var(--c-failed);
+}
+
+.accent-purple {
+    color: var(--c-purple);
+}
+
+.accent-amber {
+    color: var(--c-amber);
+}
+
+.kpi-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-secondary);
+    margin: 0 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kpi-progress-track {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.kpi-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.fill-cyan {
+    background: var(--c-cyan);
+}
+
+.fill-green {
+    background: var(--c-success);
+}
+
+.fill-red {
+    background: var(--c-failed);
+}
+
+.fill-purple {
+    background: var(--c-purple);
+}
+
+.fill-amber {
+    background: var(--c-amber);
+}

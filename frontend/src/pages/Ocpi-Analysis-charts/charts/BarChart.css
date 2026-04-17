@@ -1,0 +1,87 @@
+/* ─── BarChart.css ────────────────────────────────────────────────────────── */
+
+.bar-chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+}
+
+@media (max-width: 900px) {
+    .bar-chart-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Header rows ───────────────────────────────────────────────────────────── */
+.chart-header-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: var(--space-3);
+    min-height: 20px;
+}
+
+.chart-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+/* ── Range subtitle ────────────────────────────────────────────────────────── */
+.chart-card-subtitle {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+}
+
+/* ── Paginator ─────────────────────────────────────────────────────────────── */
+.paginator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-shrink: 0;
+}
+
+.pag-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--c-border);
+    background: transparent;
+    color: var(--c-text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.pag-btn:hover:not(:disabled) {
+    background: var(--c-success-dim);
+    border-color: var(--c-border-active);
+    color: var(--c-success);
+}
+
+.pag-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.pag-info {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--c-text-muted);
+    min-width: 28px;
+    text-align: center;
+    letter-spacing: 0.04em;
+}

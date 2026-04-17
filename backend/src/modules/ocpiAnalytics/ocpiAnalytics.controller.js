@@ -1,54 +1,20 @@
 const service = require("./ocpiAnalytics.service");
 
-exports.summary = async (req, res) => {
+// Utility to handle straight-to-DB queries without caching temporal mismatches
+const withLiveQuery = async (req, res, endpoint, serviceMethod) => {
     try {
-        const data = await service.getSummary(global.cmsDb, req.query);
+        const data = await serviceMethod(global.cmsDb, req.query);
         res.json({ success: true, data });
     } catch (err) {
-        console.error(err);
+        console.error(`[Analytics Error] ${endpoint}:`, err);
         res.status(500).json({ success: false, error: err.message });
     }
 };
 
-exports.modules = async (req, res) => {
-    try {
-        const data = await service.getModuleStats(global.cmsDb, req.query);
-        res.json({ success: true, data });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-};
-
-exports.partners = async (req, res) => {
-    try {
-        const data = await service.getPartnerStats(global.cmsDb, req.query);
-        res.json({ success: true, data });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-};
-
-exports.failures = async (req, res) => {
-    try {
-        const data = await service.getFailureStats(global.cmsDb, req.query);
-        res.json({ success: true, data });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-};
-
-exports.logs = async (req, res) => {
-    try {
-        const data = await service.getLogs(
-            global.cmsDb,
-            req.query,
-            req.query
-        );
-        res.json({ success: true, data });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-};
+exports.dashboardStats = (req, res) => withLiveQuery(req, res, "dashboard-stats", service.getDashboardStats);
+exports.timeSeriesStats = (req, res) => withLiveQuery(req, res, "time-series-stats", service.getTimeSeriesStats);
+exports.logs = (req, res) => withLiveQuery(req, res, "logs", service.getLogs);
+exports.partyTimeSeriesStats = (req, res) => withLiveQuery(req, res, "party-time-series", service.getPartyTimeSeriesStats);
 
 exports.allParties = async (req, res) => {
     try {

@@ -35,6 +35,7 @@ const loginUser = async (email, password) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      allowedModules: user.allowedModules,
     },
   };
 };

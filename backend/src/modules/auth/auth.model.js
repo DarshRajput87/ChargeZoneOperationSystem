@@ -1,33 +1,3 @@
-const mongoose = require("mongoose");
-
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    role: {
-      type: String,
-      enum: ["ADMIN", "OPS", "SUPPORT", "VIEWER"],
-      default: "VIEWER",
-    },
-    status: {
-      type: String,
-      enum: ["ACTIVE", "DISABLED"],
-      default: "ACTIVE",
-    },
-  },
-  { timestamps: true }
-);
-
-module.exports = mongoose.model("User", userSchema);
+// auth.model.js — re-exports the canonical User model from the user module
+// The User schema (with allowedModules) lives in ../user/User.js
+module.exports = require("../user/User");
