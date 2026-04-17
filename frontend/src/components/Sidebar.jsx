@@ -33,35 +33,35 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         <nav>
 
-          {/* Customer Management */}
-          <NavLink to="/customer-management" onClick={onClose}>Customer Management</NavLink>
+          {/* User Accounts */}
+          <NavLink to="/customer-management" onClick={onClose}>User Accounts</NavLink>
 
-          {/* User Segmentation */}
-          <NavLink to="/user-segmentation" onClick={onClose}>User Segmentation</NavLink>
+          {/* User Segments */}
+          <NavLink to="/user-segmentation" onClick={onClose}>User Segments</NavLink>
 
-          {/* User Review */}
+          {/* Support */}
           <div className="menu-module">
             <div
               className="module-title"
               onClick={() => toggleModule("user-review")}
             >
-              User Review
+              Support
             </div>
 
             {openModule === "user-review" && (
               <div className="submenu">
                 <NavLink to="/user-review/pending-tickets" className="submenu-item" onClick={onClose}>
-                  Pending Tickets
+                  Open Tickets
                 </NavLink>
                 <NavLink to="/user-review/closed-tickets" className="submenu-item" onClick={onClose}>
-                  Closed Tickets
+                  Resolved Tickets
                 </NavLink>
               </div>
             )}
           </div>
 
-          {/* Review Analysis */}
-          <NavLink to="/user-review/review-analysis" onClick={onClose}>Review Analysis</NavLink>
+          {/* Review Insights */}
+          <NavLink to="/user-review/review-analysis" onClick={onClose}>Review Insights</NavLink>
 
         </nav>
       </div>
@@ -79,15 +79,15 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       <nav>
 
-        <NavLink to="/dashboard" onClick={onClose}>Dashboard</NavLink>
-        <NavLink to="/station-explorer" onClick={onClose}>Station Explorer</NavLink>
-        <NavLink to="/fleet" onClick={onClose}>Fleet</NavLink>
+        <NavLink to="/dashboard" onClick={onClose}>Command Center</NavLink>
+        <NavLink to="/station-explorer" onClick={onClose}>Station Network</NavLink>
+        <NavLink to="/fleet" onClick={onClose}>Vehicle Fleet</NavLink>
         <NavLink to="/simulator" onClick={onClose}>Charger Simulator</NavLink>
 
         {/* EMSP MODULE */}
         <div className="menu-module">
           <div className="module-title" onClick={() => toggleModule("emsp")}>
-            EMSP
+            eMobility Services (EMSP)
           </div>
 
           {openModule === "emsp" && (
@@ -98,7 +98,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   className="submenu-item submenu-group-title"
                   onClick={() => toggleSubMenu("inprogress")}
                 >
-                  <span>In Progress</span>
+                  <span>In-Progress Sessions</span>
                   <span className="submenu-arrow">
                     {openSubMenu === "inprogress" ? "▾" : "▸"}
                   </span>
@@ -107,10 +107,10 @@ const Sidebar = ({ isOpen, onClose }) => {
                 {openSubMenu === "inprogress" && (
                   <div className="submenu submenu-nested">
                     <NavLink to="/emsp-in-progress" className="submenu-item submenu-item--nested" onClick={onClose}>
-                      Sessions
+                      EMSP In-Progress Sessions
                     </NavLink>
                     <NavLink to="/emsp-in-progress-analysis" className="submenu-item submenu-item--nested" onClick={onClose}>
-                      Analysis
+                      EMSP In-Progress Analytics
                     </NavLink>
                   </div>
                 )}
@@ -121,7 +121,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   className="submenu-item submenu-group-title"
                   onClick={() => toggleSubMenu("faulty")}
                 >
-                  <span>Faulty</span>
+                  <span>Fault Management</span>
                   <span className="submenu-arrow">
                     {openSubMenu === "faulty" ? "▾" : "▸"}
                   </span>
@@ -130,17 +130,17 @@ const Sidebar = ({ isOpen, onClose }) => {
                 {openSubMenu === "faulty" && (
                   <div className="submenu submenu-nested">
                     <NavLink to="/emsp-faulty-sessions" className="submenu-item submenu-item--nested" onClick={onClose}>
-                      Sessions
+                      EMSP Fault Sessions
                     </NavLink>
                     <NavLink to="/emsp-faulty-sesssion-analysis" className="submenu-item submenu-item--nested" onClick={onClose}>
-                      Analysis
+                      EMSP Fault Diagnostics
                     </NavLink>
                   </div>
                 )}
               </div>
 
               <NavLink to="/emsp-CDR-Builder" className="submenu-item" onClick={onClose}>
-                CDR Builder
+                EMSP Session Settlement
               </NavLink>
 
             </div>
@@ -150,43 +150,43 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* CPO MODULE */}
         <div className="menu-module">
           <div className="module-title" onClick={() => toggleModule("cpo")}>
-            CPO
+            Charge Point Operations (CPO)
           </div>
 
           {openModule === "cpo" && (
             <div className="submenu">
               <NavLink to="/cpo-CDR-Push" className="submenu-item" onClick={onClose}>
-                CDR Push
+                CPO CDR Dispatch
               </NavLink>
             </div>
           )}
         </div>
 
-        {/* USER REVIEW MODULE */}
+        {/* User EXPERIENCE MODULE */}
         <div className="menu-module">
           <div className="module-title" onClick={() => toggleModule("user-review")}>
-            Product
+            User Experience
           </div>
 
           {openModule === "user-review" && (
             <div className="submenu">
-              <NavLink to="/customer-management" onClick={onClose}>Customer Management</NavLink>
-              <NavLink to="/user-segmentation" className="submenu-item" onClick={onClose}>User Segmentation</NavLink>
+              <NavLink to="/customer-management" onClick={onClose}>User Accounts</NavLink>
+              <NavLink to="/user-segmentation" className="submenu-item" onClick={onClose}>User Segments</NavLink>
               <NavLink to="/user-review/pending-tickets" className="submenu-item" onClick={onClose}>
-                Pending Tickets
+                Open Tickets
               </NavLink>
               <NavLink to="/user-review/closed-tickets" className="submenu-item" onClick={onClose}>
-                Closed Tickets
+                Resolved Tickets
               </NavLink>
               <NavLink to="/user-review/review-analysis" className="submenu-item" onClick={onClose}>
-                Review Analysis
+                Review Insights
               </NavLink>
             </div>
           )}
         </div>
 
-        <NavLink to="/analysis" onClick={onClose}>OCPI Analysis</NavLink>
-        <NavLink to="/ocpi-analysis-charts" onClick={onClose}>OCPI Charts</NavLink>
+        <NavLink to="/analysis" onClick={onClose}>OCPI Analytics</NavLink>
+        <NavLink to="/ocpi-analysis-charts" onClick={onClose}>OCPI Insights</NavLink>
         <NavLink to="/settings" onClick={onClose}>Settings</NavLink>
 
       </nav>
